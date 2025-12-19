@@ -7,6 +7,8 @@
 ---@field public global_trigger TriggerSkill[] @ 所有的全局触发技
 ---@field public global_status_skill table<class, Skill[]> @ 所有的全局状态技
 ---@field public ui_packages table<string, UIPackage> @ UI
+---@field public game_modes table<string, GameMode> @ 所有游戏模式
+---@field public main_mode_list table<string, string[]> @ 主模式检索表
 local Engine = class("Base.Engine")
 
 function Engine:initialize()
@@ -18,6 +20,9 @@ function Engine:initialize()
   self.global_trigger = {}
   self.global_status_skill = {}
   self.ui_packages = {}
+
+  self.game_modes = {}
+  self.main_mode_list = {}
 end
 
 ---@deprecated
@@ -154,5 +159,22 @@ function Engine:getUIPackage(name)
   return self.ui_packages[name]
 end
 
+--- 向Engine中添加一系列游戏模式。
+---@param game_modes GameMode[] @ 要添加的游戏模式列表
+function Engine:addGameModes(game_modes)
+  for _, s in ipairs(game_modes) do
+    self:addGameMode(s)
+  end
+end
+
+--- 向Engine中添加一个游戏模式。
+---@param game_mode GameMode @ 要添加的游戏模式
+function Engine:addGameMode(game_mode)
+  assert(game_mode:isInstanceOf(GameMode))
+  if self.game_modes[game_mode.name] ~= nil then
+    error(string.format("Duplicate game_mode %s detected", game_mode.name))
+  end
+  self.game_modes[game_mode.name] = game_mode
+end
 
 return Engine

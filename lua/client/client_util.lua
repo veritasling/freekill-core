@@ -65,19 +65,19 @@ function IsCompanionWith(general, general2)
   return _general:isCompanionWith(_general2)
 end
 
-local cardSubtypeStrings = {
-  [Card.SubtypeNone] = "none",
-  [Card.SubtypeDelayedTrick] = "delayed_trick",
-  [Card.SubtypeWeapon] = "weapon",
-  [Card.SubtypeArmor] = "armor",
-  [Card.SubtypeDefensiveRide] = "defensive_ride",
-  [Card.SubtypeOffensiveRide] = "offensive_ride",
-  [Card.SubtypeTreasure] = "treasure",
-}
-
 ---@param id integer
 ---@param filterCard? boolean @ 是否获取经过锁视的牌？
 function GetCardData(id, filterCard)
+  local cardSubtypeStrings = {
+    [Card.SubtypeNone] = "none",
+    [Card.SubtypeDelayedTrick] = "delayed_trick",
+    [Card.SubtypeWeapon] = "weapon",
+    [Card.SubtypeArmor] = "armor",
+    [Card.SubtypeDefensiveRide] = "defensive_ride",
+    [Card.SubtypeOffensiveRide] = "offensive_ride",
+    [Card.SubtypeTreasure] = "treasure",
+  }
+
   local card = Fk:getCardById(id, not filterCard)
   if card == nil then
     return {

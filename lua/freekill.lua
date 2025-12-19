@@ -157,6 +157,10 @@ if table.contains(dirs, "lunarltk") then
   if UsingNewCore then FileIO.cd("packages/freekill-core") end
   Fk:load()
 else
-  Fk = ModManager:new()
+  local baseEngine = require "core.engine"
+  local MiniEngine = baseEngine:subclass("MiniEngine") --[[@as Base.ModManager]]
+  MiniEngine:include(ModManager)
+  Fk = MiniEngine:new()
+  Fk:initModManager()
   Fk:loadPackages()
 end

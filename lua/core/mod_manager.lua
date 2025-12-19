@@ -6,7 +6,6 @@
 ---@field public extension_names string[] @ Mod名字的数组，为了方便排序
 ---@field public translations table<string, table<string, string>> @ 翻译表
 ---@field public boardgames { [string] : BoardGame } @ name -> game
----@field public game_modes table<string, GameMode> @ 所有游戏模式
 ---@field public taskdefs { [string] : TaskDef } @ name -> taskdef
 local ModManager = {}
 
@@ -24,11 +23,11 @@ function ModManager:initModManager()
   self.translations = {}  -- srcText --> translated
 
   self.boardgames = {}
-  self.game_modes = {}
 
   self.taskdefs = {}
 
   self.Base = {
+    Package = require "core.package",
     Player = require "core.player",
     RoomBase = require "core.roombase",
     ClientBase = require "client.clientbase",
@@ -131,36 +130,18 @@ end
 function ModManager:getBoardGame(name)
   local gameMode = Fk.game_modes[name or ""]
   local gameName = gameMode and gameMode.game_name
-  local ret = self.boardgames[gameName or "lunarltk"]
+  local ret = self.boardgames[gameName]
   if ret then return ret end
   return BoardGame {
-    name = "lunarltk",
-    room_klass = Room,
-    client_klass = Client,
-    engine = Fk,
+    name = "nil",
+    room_klass = nil,
+    client_klass = nil,
+    engine = nil,
     page = {
-      uri = "Fk.Pages.LunarLTK",
-      name = "Room",
+      uri = "Fk.Widgets",
+      name = "PageBase",
     }
   }
-end
-
---- 向Engine中添加一系列游戏模式。
----@param game_modes GameMode[] @ 要添加的游戏模式列表
-function ModManager:addGameModes(game_modes)
-  for _, s in ipairs(game_modes) do
-    self:addGameMode(s)
-  end
-end
-
---- 向Engine中添加一个游戏模式。
----@param game_mode GameMode @ 要添加的游戏模式
-function ModManager:addGameMode(game_mode)
-  assert(game_mode:isInstanceOf(GameMode))
-  if self.game_modes[game_mode.name] ~= nil then
-    error(string.format("Duplicate game_mode %s detected", game_mode.name))
-  end
-  self.game_modes[game_mode.name] = game_mode
 end
 
 local TaskDef = require "core.task_def"
