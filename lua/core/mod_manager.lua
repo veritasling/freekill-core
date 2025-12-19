@@ -6,6 +6,7 @@
 ---@field public extension_names string[] @ Mod名字的数组，为了方便排序
 ---@field public translations table<string, table<string, string>> @ 翻译表
 ---@field public boardgames { [string] : BoardGame } @ name -> game
+---@field public game_modes table<string, GameMode> @ 所有游戏模式
 ---@field public taskdefs { [string] : TaskDef } @ name -> taskdef
 local ModManager = {}
 
@@ -23,6 +24,7 @@ function ModManager:initModManager()
   self.translations = {}  -- srcText --> translated
 
   self.boardgames = {}
+  self.game_modes = {}
 
   self.taskdefs = {}
 
@@ -39,6 +41,27 @@ function ModManager:initModManager()
   }
 end
 
+-- 获取拓展包们的文件夹名，不考虑被禁用了的
+---@return string[]
+function ModManager:getExtensionDirectories()
+  if UsingNewCore then FileIO.cd("../..") end
+
+  local directories = FileIO.ls("packages")
+  table.removeOne(directories, "freekill-core")
+  table.removeOne(directories, "standard")
+  table.removeOne(directories, "standard_cards")
+  table.removeOne(directories, "maneuvering")
+  table.removeOne(directories, "test")
+  local _disable_packs = json.decode(fk.GetDisabledPacks())
+  directories = table.filter(directories, function(d)
+    return not table.contains(_disable_packs, d) and
+      FileIO.isDir("packages/" .. d)
+  end)
+
+  if UsingNewCore then FileIO.cd("packages/freekill-core") end
+  return directories
+end
+
 --- 加载所有拓展包。
 ---
 --- Engine会在packages/下搜索所有含有init.lua的文件夹，并把它们作为拓展包加载进来。
@@ -46,40 +69,14 @@ end
 --- 这样的init.lua可以返回单个拓展包，也可以返回拓展包数组，或者什么都不返回。
 ---
 --- 标包和标准卡牌包比较特殊，它们永远会在第一个加载。
----@param self Engine FIXME
 ---@return nil
 function ModManager:loadPackages()
-  if FileIO.pwd():endsWith("packages/freekill-core") then
-    UsingNewCore = true
-    FileIO.cd("../..")
-  end
-  local directories = FileIO.ls("packages")
+  local directories = self:getExtensionDirectories()
 
-  -- load standard & standard_cards first
-  if UsingNewCore then
-    require("packages.freekill-core.standard"):install(self)
-    require("packages.freekill-core.standard_cards"):install(self)
-    require("packages.freekill-core.maneuvering"):install(self)
-    require("packages.freekill-core.test"):install(self)
-    table.removeOne(directories, "freekill-core")
-  else
-    require("packages.standard"):install(self)
-    require("packages.standard_cards"):install(self)
-    require("packages.maneuvering"):install(self)
-    require("packages.test"):install(self)
-  end
-  table.removeOne(directories, "standard")
-  table.removeOne(directories, "standard_cards")
-  table.removeOne(directories, "maneuvering")
-  table.removeOne(directories, "test")
-
-  ---@type string[]
-  local _disable_packs = json.decode(fk.GetDisabledPacks())
+  if UsingNewCore then FileIO.cd("../..") end
 
   for _, dir in ipairs(directories) do
-    if (not string.find(dir, ".disabled")) and not table.contains(_disable_packs, dir)
-      and FileIO.isDir("packages/" .. dir)
-      and FileIO.exists("packages/" .. dir .. "/init.lua") then
+    if FileIO.exists("packages/" .. dir .. "/init.lua") then
       local pack = Pcall(require, string.format("packages.%s", dir))
       -- Note that instance of Package is a table too
       -- so dont use type(pack) == "table" here
@@ -99,9 +96,7 @@ function ModManager:loadPackages()
     end
   end
 
-  if UsingNewCore then
-    FileIO.cd("packages/freekill-core")
-  end
+  if UsingNewCore then FileIO.cd("packages/freekill-core") end
 end
 
 --- 向翻译表中加载新的翻译表。
@@ -148,6 +143,24 @@ function ModManager:getBoardGame(name)
       name = "Room",
     }
   }
+end
+
+--- 向Engine中添加一系列游戏模式。
+---@param game_modes GameMode[] @ 要添加的游戏模式列表
+function ModManager:addGameModes(game_modes)
+  for _, s in ipairs(game_modes) do
+    self:addGameMode(s)
+  end
+end
+
+--- 向Engine中添加一个游戏模式。
+---@param game_mode GameMode @ 要添加的游戏模式
+function ModManager:addGameMode(game_mode)
+  assert(game_mode:isInstanceOf(GameMode))
+  if self.game_modes[game_mode.name] ~= nil then
+    error(string.format("Duplicate game_mode %s detected", game_mode.name))
+  end
+  self.game_modes[game_mode.name] = game_mode
 end
 
 local TaskDef = require "core.task_def"

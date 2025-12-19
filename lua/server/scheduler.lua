@@ -1,16 +1,11 @@
 -- SPDX-License-Identifier: GPL-3.0-or-later
 
 Request = require "server.request"
-GameLogic = require "lunarltk.server.gamelogic"
-ServerPlayer = require "lunarltk.server.serverplayer"
-Room = require "lunarltk.server.room"
 
-for _, l in ipairs(Fk._custom_events) do
+--- FIXME 此为lunarltk残留，且抛开这个不谈，_custom_events也早该扔掉了
+---@diagnostic disable-next-line
+for _, l in ipairs(Fk._custom_events or {}) do
   local name, p, m, c, e = l.name, l.p, l.m, l.c, l.e
-  -- GameEvent.prepare_funcs[name] = p
-  -- GameEvent.functions[name] = m
-  -- GameEvent.cleaners[name] = c
-  -- GameEvent.exit_funcs[name] = e
   local custom = GameEvent:subclass(name)
   custom.prepare = p
   custom.main = m
@@ -19,14 +14,10 @@ for _, l in ipairs(Fk._custom_events) do
   GameEvent[name] = custom
 end
 
----@type Player
-Self = nil -- `Self' is client-only, but we need it in AI
-dofile "lua/lunarltk/server/ai/init.lua"
-
 local Task = require "server.task"
 
 -- 所有当前正在运行的房间（即游戏尚未结束的房间）
----@type table<integer, Room>
+---@type table<integer, ServerRoomBase>
 local runningRooms = {}
 
 -- 所有正在执行中的Lobby task

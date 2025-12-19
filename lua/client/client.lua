@@ -1,8 +1,3 @@
----@type table<string, fun(self: Client, data: any)>
-fk.client_callback = {}
-
-dofile "lua/lunarltk/client/client.lua"
-
 -- 总而言之就是会让roomScene.state变为responding或者playing的状态
 local pattern_refresh_commands = {
   "PlayCard",
@@ -31,7 +26,7 @@ ClientCallback = function(_self, command, jsonData, isRequest)
   -- CBOR调试中。。。
   -- print(command, jsonData:gsub(".", function(c) return ("%02x"):format(c:byte()) end))
 
-  local cb = self.callbacks[command] or fk.client_callback[command]
+  local cb = self.callbacks[command]
   local data
   if table.contains(no_decode_commands, command) then
     data = jsonData
@@ -54,11 +49,30 @@ ClientCallback = function(_self, command, jsonData, isRequest)
   end
 end
 
+local MinimalClientPlayer = Fk.Base.Player:subclass("ClientPlayer")
+MinimalClientPlayer:include(Fk.Base.ClientPlayerBase)
+function MinimalClientPlayer:initialize(cp)
+  Fk.Base.Player.initialize(self)
+  Fk.Base.ClientPlayerBase.initialize(self, cp)
+end
+
+local MinimalClient = Fk.Base.RoomBase:subclass("MinimalClient")
+MinimalClient:include(Fk.Base.ClientBase)
+function MinimalClient:initialize(_client)
+  Fk.Base.RoomBase.initialize(self)
+  Fk.Base.ClientBase.initialize(self, _client)
+
+  ---@diagnostic disable-next-line
+  self.clientplayer_klass = MinimalClientPlayer
+end
+
 -- Create ClientInstance (used by Lua)
 -- Let Cpp call this function to create
 function CreateLuaClient(cpp_client)
-  ClientInstance = Client:new(cpp_client)
+  ClientInstance = MinimalClient:new(cpp_client)
 end
+
+-- FIXME: lunarltk残党
 dofile "lua/client/client_util.lua"
 
 if FileIO.pwd():endsWith("packages/freekill-core") then
