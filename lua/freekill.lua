@@ -149,6 +149,12 @@ end
 -- 主要一开始的时候只打算做个ltk克隆而不是通用桌游引擎
 -- 导致现在耦合着这样一个玩意
 -- FIXME 想想办法把这里消除掉吧
+local baseEngine = require "core.engine"
+local MiniEngine = baseEngine:subclass("MiniEngine") --[[@as Base.ModManager]]
+MiniEngine:include(ModManager)
+Fk = MiniEngine:new()
+Fk:initModManager()
+
 local dirs = ModManager:getExtensionDirectories()
 if table.contains(dirs, "lunarltk") then
   if UsingNewCore then FileIO.cd("../..") end
@@ -157,10 +163,5 @@ if table.contains(dirs, "lunarltk") then
   if UsingNewCore then FileIO.cd("packages/freekill-core") end
   Fk:load()
 else
-  local baseEngine = require "core.engine"
-  local MiniEngine = baseEngine:subclass("MiniEngine") --[[@as Base.ModManager]]
-  MiniEngine:include(ModManager)
-  Fk = MiniEngine:new()
-  Fk:initModManager()
   Fk:loadPackages()
 end

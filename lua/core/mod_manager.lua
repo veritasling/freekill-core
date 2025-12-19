@@ -130,7 +130,7 @@ end
 function ModManager:getBoardGame(name)
   local gameMode = Fk.game_modes[name or ""]
   local gameName = gameMode and gameMode.game_name
-  local ret = self.boardgames[gameName]
+  local ret = self.boardgames[gameName or "lunarltk"]
   if ret then return ret end
   return BoardGame {
     name = "nil",
