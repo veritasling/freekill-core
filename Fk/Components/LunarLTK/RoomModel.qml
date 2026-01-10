@@ -1,6 +1,5 @@
 import QtQuick
 import Fk
-import Fk.Widgets as W
 
 // 试做型RoomModel
 //
@@ -9,6 +8,10 @@ import Fk.Widgets as W
 // 因此，model需要定义对局页面依赖的各种数据
 //
 // 然后，这个model再负责从Lua中及时取得最新数据。
+//
+// 预计还需要定义一系列signal
+//
+// 隔壁PhotoModel同理
 
 QtObject {
   id: root

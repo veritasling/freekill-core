@@ -16,12 +16,15 @@ PhotoBase {
   required property PhotoModel dataModel
   onDataModelChanged: dataModel.photoItem = root;
 
+  // TODO 这些目前写在PhotoBase，所以先手动绑定，之后大改房间等待页的时候杀之
   playerid: dataModel.playerid
   avatar: dataModel.avatar
   screenName: dataModel.screenName
   general: dataModel.general
   deputyGeneral: dataModel.deputyGeneral
   kingdom: dataModel.kingdom
+  seatNumber: dataModel.seatNumber
+  dead: dataModel.dead
 
   property int handcards: 0
   property int distance: -1
@@ -219,11 +222,11 @@ PhotoBase {
 
   Image {
     // id: saveme
-    visible: (root.dataModel.dead && !root.dataModel.rest) || root.dataModel.dying || root.surrendered
+    visible: (root.dead && !root.dataModel.rest) || root.dataModel.dying || root.surrendered
     source: {
       if (root.surrendered) {
         return SkinBank.deathDir + "surrender";
-      } else if (root.dataModel.dead) {
+      } else if (root.dead) {
         return SkinBank.getRoleDeathPic(root.dataModel.role);
       }
       return SkinBank.deathDir + "saveme";
@@ -311,14 +314,14 @@ PhotoBase {
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.bottom: parent.bottom
     anchors.bottomMargin: -24
-    property var seatChr: [
-      "一", "二", "三", "四", "五", "六",
-      "七", "八", "九", "十", "十一", "十二",
-    ]
     font.family: Config.li2Name
     font.pixelSize: 24
     text: {
-      return seatChr[seatNumber - 1];
+      const seatChr = [
+        "一", "二", "三", "四", "五", "六",
+        "七", "八", "九", "十", "十一", "十二",
+      ]
+      return seatChr[root.seatNumber - 1];
     }
 
     glow.color: "brown"

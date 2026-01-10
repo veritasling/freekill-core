@@ -84,11 +84,10 @@ W.PageBase {
           dashboard.pending_skill = "";
           // dashboard.retractAllPiles();
 
-          for (let i = 0; i < photoModel.count; i++) {
-            const item = photos.itemAt(i);
+          for (const model of photoModel) {
+            const item = model.photoItem;
             item.state = "normal";
             item.selected = false;
-            // item.selectable = false;
           }
 
           if (popupBox.item != null) {
@@ -662,7 +661,7 @@ W.PageBase {
   }
 
   function showDistance(show) {
-    for (let i = 0; i < photoModel.count; i++) {
+    for (let i = 0; i < photoModel.length; i++) {
       const item = photos.itemAt(i);
       if (show) {
         item.distance = Ltk.distanceTo(Self.id, item.playerid);
@@ -729,7 +728,7 @@ W.PageBase {
       photo.selectable = pdata.enabled;
       photo.selected = pdata.selected;
     });
-    for (let i = 0; i < photoModel.count; i++) {
+    for (let i = 0; i < photoModel.length; i++) {
       const item = photos.itemAt(i);
       item.targetTip = Ltk.getTargetTip(item.playerid);
     }
@@ -910,6 +909,7 @@ W.PageBase {
 
     bgm.play();
 
+    // TODO 需要考虑重连，一定要把Self.id放在第一个
     for (let i = 0; i < dataModel.playerNum; i++) {
       photoModel.push(dataModel.players[i]);
     }

@@ -697,7 +697,7 @@ callbacks["ArrangeSeats"] = (sender, order) => {
 
   for (let i = 0; i < photoModel.length; i++) {
     const item = photoModel[i];
-    item.seatNumber = order.indexOf(item.id) + 1;
+    item.seatNumber = order.indexOf(item.playerid) + 1;
   }
 
   // make Self to the first of list, then reorder photomodel
@@ -708,7 +708,7 @@ callbacks["ArrangeSeats"] = (sender, order) => {
 
   for (let i = 0; i < photoModel.length; i++) {
     const item = photoModel[i];
-    item.index = photoOrder.indexOf(item.id);
+    item.index = photoOrder.indexOf(item.playerid);
   }
 
   arrangePhotos();
@@ -1514,8 +1514,8 @@ callbacks["ChangeSelf"] = (sender, j) => {
   let order = new Array(photoModel.length);
   for (let i = 0; i < photoModel.length; i++) {
     const item = photoModel[i];
-    order[item.seatNumber - 1] = item.id;
-    if (item.id === Self.id) {
+    order[item.seatNumber - 1] = item.playerid;
+    if (item.playerid === Self.id) {
       dashboard.self = photos.itemAt(i);
     }
   }
