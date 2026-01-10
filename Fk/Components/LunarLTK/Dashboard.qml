@@ -64,7 +64,7 @@ RowLayout {
       Ltk.updateRequestUI("CardItem", cardId, "doubleClick", { selected, doubleClickUse: Config.doubleClickUse, autoTarget: Config.autoTarget } );
     }
     function onLengthChanged() {
-      self.handcards = handcardAreaItem.length;
+      self.dataModel.updateHandcards();
     }
   }
 

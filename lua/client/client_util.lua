@@ -1109,10 +1109,6 @@ function GetMiniGame(gtype, p, data)
   }
 end
 
-function ReloadPackage(path)
-  Fk:reloadPackage(path)
-end
-
 function GetPendingSkill()
   local h = ClientInstance.current_request_handler
   local reqActive = ClientInstance.request_handlers["AskForUseActiveSkill"]
@@ -1188,13 +1184,6 @@ function CardVisibility(cardId)
   return player:cardVisible(cardId)
 end
 
-function RoleVisibility(targetId)
-  local player = Self
-  local target = ClientInstance:getPlayerById(targetId)
-  if not target then return false end
-  return player:roleVisible(target)
-end
-
 function IsMyBuddy(me, other)
   local from = ClientInstance:getPlayerById(me)
   local to = ClientInstance:getPlayerById(other)
@@ -1224,15 +1213,8 @@ end
 --- 刷新状态技状态和UI等
 function RefreshStatusSkills()
   local self = ClientInstance
-  -- if not self.recording then return end -- 在回放录像就别刷了
   -- 刷所有人手牌上限，体力值及可见标记；以及身份可见性
   for _, p in ipairs(self.alive_players) do
-    self:notifyUI("MaxCard", {
-      pcardMax = p:getMaxCards(),
-      php = p.hp,
-      id = p.id,
-    })
-
     for k, v in pairs(p.mark) do
       if k and k:startsWith("@") and v and v ~= 0 then
         if k:startsWith("@[") and k:find(']') then
@@ -1247,14 +1229,7 @@ function RefreshStatusSkills()
         self:notifyUI("SetPlayerMark", { p.id, k, v })
       end
     end
-
-    self:notifyUI("PropertyUpdate", {
-      p.id, "role_shown", not not RoleVisibility(p.id)
-    })
   end
-
-  -- 刷牌堆数
-  self:notifyUI("UpdateDrawPile", #self.draw_pile)
 
   -- 刷自己的手牌
   Self:filterHandcards()

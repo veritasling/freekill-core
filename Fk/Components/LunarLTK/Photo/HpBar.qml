@@ -8,8 +8,8 @@ import Fk.Components.LunarLTK
 Column {
   id: root
 
-  property var colors: ["#F4180E", "#F4180E", "#E3B006", "#25EC27"]
   required property PhotoModel dataModel
+  property var colors: ["#F4180E", "#F4180E", "#E3B006", "#25EC27"]
 
   Shield {
     id: shield

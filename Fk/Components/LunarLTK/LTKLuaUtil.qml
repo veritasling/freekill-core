@@ -7,13 +7,32 @@ import Fk
 QtObject {
 
   // 遵循Lua里面那样，把相关枚举全堆到这里
+  enum General {
+    Male = 1,
+    Female = 2,
+    Bigender = 3,
+    Agender = 4
+  }
+
+  enum Player {
+    RoundStart = 1,
+    Start = 2,
+    Judge = 3,
+    Draw = 4,
+    Play = 5,
+    Discard = 6,
+    Finish = 7,
+    NotActive = 8,
+    PhaseNone = 9
+  }
+
   enum Card {
     Spade = 1,
     Club = 2,
     Heart = 3,
     Diamond = 4,
     NoSuit = 5,
-    
+
     Black = 1,
     Red = 2,
     NoColor = 3,
@@ -28,6 +47,27 @@ QtObject {
     DiscardPile = 7,
     Void = 8
   }
+
+  // 奇技淫巧系列
+
+  property var client // 在RoomModel.qml的初始化阶段创建。
+
+  function getPlayer(id) {
+    return Lua.evaluate(`ClientInstance:getPlayerById(${id})`);
+  }
+
+  function getCard(id) {
+    return Lua.evaluate(`Fk:getCardById(${id})`);
+  }
+
+  function getGeneral(name) {
+    return Lua.evaluate(`Fk.generals['${name}']`);
+  }
+
+  function getSkill(name) {
+    return Lua.evaluate(`Fk.skills['${name}']`);
+  }
+
 
   ///////////////// 施工中 //////////////////////
   // 把client_util.lua公式化转了一遍。还没剔除
@@ -261,10 +301,6 @@ QtObject {
     return Lua.call("GetMiniGame", gtype, p, data);
   }
 
-  function reloadPackage(path) {
-    return Lua.call("ReloadPackage", path);
-  }
-
   function getPendingSkill() {
     return Lua.call("GetPendingSkill");
   }
@@ -283,10 +319,6 @@ QtObject {
 
   function cardVisibility(cardId) {
     return Lua.call("CardVisibility", cardId);
-  }
-
-  function roleVisibility(targetId) {
-    return Lua.call("RoleVisibility", targetId);
   }
 
   function isMyBuddy(me, other) {

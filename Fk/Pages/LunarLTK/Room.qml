@@ -151,18 +151,19 @@ W.PageBase {
             Ltk.updateRequestUI("Photo", playerid, "click", { selected, autoTarget: Config.autoTarget } );
         }
 
-        onDoubleTappedChanged: {
-          if (doubleTapped && enabled) {
-            // Ltk.updateRequestUI("Photo", playerid, "doubleClick", { selected, doubleClickUse: Config.doubleClickUse, autoTarget: Config.autoTarget } )
-            doubleTapped = false;
+        onRightClicked: {
+          if (playerid === 0 || playerid === -1) {
+            return;
           }
+
+          roomScene.startCheat("PlayerDetail", { photo: this });
         }
 
         Component.onCompleted: {
-          // if (index === 0) {
-          //   dashboard.self = this;
-          //   enableChangeSkin = true;
-          // }
+          if (dataModel.index === 0) {
+            dashboard.self = this;
+            enableChangeSkin = true;
+          }
         }
       }
     }
@@ -649,14 +650,10 @@ W.PageBase {
     running: true
     repeat: true
     onTriggered: {
+      dataModel.refreshData();
       Ltk.refreshStatusSkills();
-      // FIXME 本来可以用客户端notifyUI(AddObserver)刷旁观列表的
-      // FIXME 但是由于重启智慧所以还是加入一秒0.2刷得了
       // 刷托管按钮
       trustBtn.enabled = true;
-      // 刷大家的明置手牌提示框
-      for (let i = 0; i < photos.count; i++)
-        photos.itemAt(i).handcardsChanged();
     }
   }
 
@@ -728,9 +725,8 @@ W.PageBase {
       photo.selectable = pdata.enabled;
       photo.selected = pdata.selected;
     });
-    for (let i = 0; i < photoModel.length; i++) {
-      const item = photos.itemAt(i);
-      item.targetTip = Ltk.getTargetTip(item.playerid);
+    for (const model of photoModel) {
+      model.updateTargetTip();
     }
 
     const buttons = uiUpdate["Button"];

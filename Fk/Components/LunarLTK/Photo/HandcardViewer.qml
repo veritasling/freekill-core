@@ -7,6 +7,8 @@ import Fk.Components.LunarLTK
 Rectangle {
   id: root
 
+  required property PhotoModel dataModel
+
   color: "#CC2E2C27"
   radius: 6
   border.color: "#A6967A"
@@ -14,29 +16,29 @@ Rectangle {
   width: 44
   height: 112
 
-  property int playerid
-  property int handcards
+  visible: {
+    if (root.dataModel.playerid === Self.id) return false;
+    if (root.dataModel.handcards.length === 0) return false; // 优先绑定再判buddy，否则不会更新
+    if (!Ltk.isMyBuddy(Self.id, root.dataModel.playerid) &&
+    !Ltk.hasVisibleCard(Self.id, root.dataModel.playerid)) return false;
+    return true;
+  }
 
   Text {
     x: 2; y: 2
     width: 42
     text: {
       if (!parent.visible) return "";
-      const unused = root.handcards; // 绑定
-      const ids = Ltk.getPlayerHandcards(root.playerid);
+      const ids = root.dataModel.handcards;
       const txt = [];
       for (const cid of ids) {
         if (txt.length >= 4) {
-          // txt.push("&nbsp;&nbsp;&nbsp;...");
           txt.push("...");
           break;
         }
         if (!Ltk.cardVisibility(cid)) continue;
         const data = Ltk.getCardData(cid, true);
         let a = Lua.tr(data.name);
-        /* if (a.length === 1) {
-           a = "&nbsp;&nbsp;" + a;
-         } else  */
          if (a.length >= 2) {
            a = a.slice(0, 2);
          }
@@ -67,7 +69,7 @@ Rectangle {
    W.TapHandler {
      onTapped: {
        const params = { name: "hand_card" };
-       let data = Ltk.getPlayerHandcards(root.playerid);
+       let data = root.dataModel.handcards;
        data = data.filter((e) => Ltk.cardVisibility(e));
 
        params.ids = data;

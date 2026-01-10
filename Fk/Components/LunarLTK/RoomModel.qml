@@ -39,10 +39,18 @@ QtObject {
   }
 
   function getPhoto(pid) {
-    for (const item of players) {
-      if (item.playerid === pid) {
-        return item;
+    for (const model of players) {
+      if (model.playerid === pid) {
+        return model;
       }
+    }
+  }
+
+  // 一秒5刷智慧
+  function refreshData() {
+    drawPileNum = Ltk.client.draw_pile.length;
+    for (const model of players) {
+      model.refreshData();
     }
   }
 
@@ -51,6 +59,7 @@ QtObject {
   }
 
   function initialize() {
+    Ltk.client = Lua.evaluate("ClientInstance");
     dashboardId = Self.id;
     const data = Lua.call("GetRoomModelData");
     playerNum = data.playerNum;

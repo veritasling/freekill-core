@@ -26,10 +26,8 @@ PhotoBase {
   seatNumber: dataModel.seatNumber
   dead: dataModel.dead
 
-  property int handcards: 0
-  property int distance: -1
   property string status: "normal"
-  property int maxCard: 0
+  property int distance: -1
 
   property alias areasSealed: equipAreaItem
   property alias markArea: markAreaItem
@@ -38,19 +36,13 @@ PhotoBase {
   property alias progressBar: progressBar
   property alias progressTip: progressTip.text
 
-  property bool doubleTapped: false
-
-  property bool playing: false
-
-  property var targetTip: []
-
   PixmapAnimation {
     id: animPlaying
     source: SkinBank.pixAnimDir + "playing"
     anchors.centerIn: parent
     loop: true
     scale: 0.825
-    visible: root.playing
+    visible: root.dataModel.phase !== Ltk.Player.NotActive
     running: visible
   }
 
@@ -255,17 +247,17 @@ PhotoBase {
 
     Text {
       text: {
-        let n = root.handcards;
-        n = Ltk.getPlayerHandcards(root.playerid).length;
-        if (root.maxCard === root.dataModel.hp || root.dataModel.hp < 0) {
+        const n = root.dataModel.handcards.length;
+        const max = root.dataModel.maxCard;
+        if (max === root.dataModel.hp || root.dataModel.hp < 0) {
           return n;
         } else {
-          const maxCard = root.maxCard < 900 ? root.maxCard : "∞";
+          const maxCard = max < 900 ? max : "∞";
           return n + "/" + maxCard;
         }
       }
       font.family: Config.libianName
-      font.pixelSize: (root.maxCard === root.dataModel.hp || root.dataModel.hp < 0 ) ? 24 : 20
+      font.pixelSize: text.includes("/") ? 24 : 20
       //font.weight: 30
       color: "white"
       anchors.horizontalCenter: parent.horizontalCenter
@@ -275,16 +267,12 @@ PhotoBase {
     }
   }
 
-  onRightClicked: {
-    showDetail();
-  }
-
   RoleComboBox {
     id: role
     value: {
       if (root.dataModel.role === "hidden") return "hidden";
       if (root.dataModel.role_shown) return root.dataModel.role;
-      Ltk.roleVisibility(root.playerid) ? root.dataModel.role : "unknown";
+      return "unknown";
     }
     anchors.top: parent.top
     anchors.topMargin: -4
@@ -399,16 +387,17 @@ PhotoBase {
     spacing: 5
 
     Repeater {
-      model: root.targetTip
+      model: root.dataModel.targetTip
 
       Item {
+        required property var modelData
         // Layout.alignment: Qt.AlignHCenter
         width: modelData.type === "normal" ? 30 : 18
 
         GlowText {
           anchors.centerIn: parent
-          visible: modelData.type === "normal"
-          text: Util.processPrompt(modelData.content)
+          visible: parent.modelData.type === "normal"
+          text: parent.modelData.content
           font.family: Config.li2Name
           color: "#FEFE84"
           font.pixelSize: {
@@ -427,7 +416,7 @@ PhotoBase {
 
         Text {
           anchors.centerIn: parent
-          visible: modelData.type === "warning"
+          visible: parent.modelData.type === "warning"
           font.family: Config.libianName
           font.pixelSize: 18
           opacity: 0.9
@@ -441,7 +430,7 @@ PhotoBase {
           style: Text.Outline
           //styleColor: "#83231F"
           styleColor: "red"
-          text: Util.processPrompt(modelData.content)
+          text: parent.modelData.content
         }
       }
     }
@@ -450,11 +439,7 @@ PhotoBase {
   InvisibleCardArea {
     id: handcardAreaItem
     anchors.centerIn: parent
-    onLengthChanged: {
-      root.handcards = Lua.evaluate(`(function()
-        return #ClientInstance:getPlayerById(${root.playerid}):getCardIds("h")
-      end)()`);
-    }
+    onLengthChanged: root.dataModel.updateHandcards();
   }
 
   DelayedTrickArea {
@@ -482,9 +467,9 @@ PhotoBase {
     color: "white"
     height: 15
     width: 15
-    visible: distance != -1
+    visible: root.distance != -1
     Text {
-      text: distance
+      text: root.distance
       anchors.centerIn: parent
     }
   }
@@ -492,18 +477,10 @@ PhotoBase {
   HandcardViewer {
     anchors.right: parent.left
     anchors.bottom: parent.bottom
-    playerid: root.playerid
-    handcards: root.handcards
     scale: 0.75
     transformOrigin: Item.BottomRight
 
-    visible: {
-      if (root.playerid === Self.id) return false;
-      if (root.handcards === 0) return false; // 优先绑定再判buddy，否则不会更新
-      if (!Ltk.isMyBuddy(Self.id, root.playerid) &&
-      !Ltk.hasVisibleCard(Self.id, root.playerid)) return false;
-      return true;
-    }
+    dataModel: root.dataModel
   }
 
   function updateLimitSkill(skill, time) {
@@ -515,14 +492,6 @@ PhotoBase {
       picMarkAreaItem.visible = data.visible;
       markAreaItem.visible = data.visible;
     }
-  }
-
-  function showDetail() {
-    if (playerid === 0 || playerid === -1) {
-      return;
-    }
-
-    roomScene.startCheat("PlayerDetail", { photo: this });
   }
 
   function getAreaItem(area) {

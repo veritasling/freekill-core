@@ -600,31 +600,12 @@ function processPrompt(prompt) {
   return raw;
 }
 
-callbacks["MaxCard"] = (sender, data) => {
-  const id = data.id;
-  const cardMax = data.pcardMax;
-  const hp = data.php;
-  const photo = getPhoto(id);
-  if (photo) {
-    photo.maxCard = cardMax;
-  }
-}
-
 callbacks["PropertyUpdate"] = (sender, data) => {
   // jsonData: int id, string property_name, value
-  const uid = data[0];
-  const property_name = data[1];
-  let value = data[2];
-
+  const [uid, property_name, value] = data;
   let model = dataModel.getPhoto(uid);
-
-  if (typeof(model) !== "undefined" && property_name in model) {
+  if (model && property_name in model) {
     model[property_name] = value;
-  }
-
-  if (property_name === "phase") {
-    let item = getPhoto(uid);
-    item.playing = value < 8; // Player.NotActive
   }
 }
 
