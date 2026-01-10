@@ -172,8 +172,11 @@ Item {
     }
 
     if (sortable && movepos != null) {
-      const handcardnum = Ltk.getPlayerHandcards(Self.id).length; // 不计入expand_pile
-      const isMyHandcard = Lua.evaluate(`ClientInstance:getCardArea(${_card.cid}) == Card.PlayerHand and ClientInstance:getCardOwner(${_card.cid}) == Self`);
+      const self = Lua.selfPlayer;
+      const room = Lua.client;
+      const handcardnum = self.getCardIds("h").length; // 不计入expand_pile
+      const isMyHandcard = room.getCardArea(_card.cid) == Ltk.Card.PlayerHand &&
+        room.getCardOwner(_card.cid).id == Self.id;
       if (isMyHandcard) {
         if (movepos >= handcardnum) movepos = handcardnum - 1;
       } else {

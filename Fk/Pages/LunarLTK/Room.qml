@@ -658,12 +658,11 @@ W.PageBase {
   }
 
   function showDistance(show) {
-    for (let i = 0; i < photoModel.length; i++) {
-      const item = photos.itemAt(i);
+    for (const model of photoModel) {
       if (show) {
-        item.distance = Ltk.distanceTo(Self.id, item.playerid);
+        model.distance = Lua.selfPlayer.distanceTo(model.luaPlayer);
       } else {
-        item.distance = -1;
+        model.distance = -1;
       }
     }
   }

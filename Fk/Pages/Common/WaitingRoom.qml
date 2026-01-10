@@ -88,7 +88,7 @@ W.PageBase {
         width: parent.width
         wrapMode: TextEdit.WordWrap
         function refresh() {
-          const data = Lua.call("GetRoomConfig");
+          const data = Lua.client.settings;
           let cardpack = Lua.call("GetAllCardPack");
           cardpack = cardpack.filter(p => !data.disabledPack.includes(p));
           const gameMode = data.gameMode;

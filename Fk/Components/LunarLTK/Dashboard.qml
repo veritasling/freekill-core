@@ -106,7 +106,7 @@ RowLayout {
   }
 
   function updateHandcards() {
-    Ltk.filterMyHandcards();
+    Lua.selfPlayer.filterHandcards();
     handcardAreaItem.cards.forEach(v => {
       v.setData(Ltk.getCardData(v.cid, true));
     });
@@ -130,12 +130,11 @@ RowLayout {
 
     skillPanel.clearSkills();
 
-    const skills = Ltk.getMySkills();
-    for (let s of skills) {
-      addSkill(s);
+    for (const s of Lua.selfPlayer.player_skills) {
+      addSkill(s.name);
     }
 
-    cards = roomScene.drawPile.remove(Ltk.getPlayerHandcards(Self.id), null,
+    cards = roomScene.drawPile.remove(Lua.selfPlayer.getCardIds("h"), null,
     Lua.fn(`function()
       local ret = {}
       for _, cid in ipairs(Self:getCardIds("h")) do

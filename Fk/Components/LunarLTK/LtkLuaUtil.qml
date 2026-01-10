@@ -50,8 +50,6 @@ QtObject {
 
   // 奇技淫巧系列
 
-  property var client // 在RoomModel.qml的初始化阶段创建。
-
   function getPlayer(id) {
     return Lua.evaluate(`ClientInstance:getPlayerById(${id})`);
   }
@@ -68,6 +66,9 @@ QtObject {
     return Lua.evaluate(`Fk.skills['${name}']`);
   }
 
+  function getPackage(name) {
+    return Lua.evaluate(`Fk.packages['${name}']`);
+  }
 
   ///////////////// 施工中 //////////////////////
   // 把client_util.lua公式化转了一遍。还没剔除
@@ -95,14 +96,6 @@ QtObject {
 
   function getCardExtensionByName(cardName) {
     return Lua.call("GetCardExtensionByName", cardName);
-  }
-
-  function getAllMods() {
-    return Lua.call("GetAllMods");
-  }
-
-  function getAllModNames() {
-    return Lua.call("GetAllModNames");
   }
 
   function getAllGeneralPack() {
@@ -145,40 +138,12 @@ QtObject {
     return Lua.call("GetCards", pack_name);
   }
 
-  function getCardSkill(cid) {
-    return Lua.call("GetCardSkill", cid);
-  }
-
-  function getCardSpecialSkills(cid) {
-    return Lua.call("GetCardSpecialSkills", cid);
-  }
-
-  function distanceTo(from, to) {
-    return Lua.call("DistanceTo", from, to);
-  }
-
-  function getPile(id, name) {
-    return Lua.call("GetPile", id, name);
-  }
-
-  function getAllPiles(id) {
-    return Lua.call("GetAllPiles", id);
-  }
-
-  function getMySkills() {
-    return Lua.call("GetMySkills");
-  }
-
   function getPlayerSkills(id) {
     return Lua.call("GetPlayerSkills", id);
   }
 
   function getSkillData(skill_name) {
     return Lua.call("GetSkillData", skill_name);
-  }
-
-  function getSkillStatus(skill_name) {
-    return Lua.call("GetSkillStatus", skill_name);
   }
 
   function cardFitPattern(card_name, pattern) {
@@ -193,24 +158,8 @@ QtObject {
     return Lua.call("GetGameModes");
   }
 
-  function getPlayerHandcards(pid) {
-    return Lua.call("GetPlayerHandcards", pid);
-  }
-
-  function getPlayerEquips(pid) {
-    return Lua.call("GetPlayerEquips", pid);
-  }
-
-  function getPlayerJudges(pid) {
-    return Lua.call("GetPlayerJudges", pid);
-  }
-
   function resetClientLua() {
     return Lua.call("ResetClientLua");
-  }
-
-  function getRoomConfig() {
-    return Lua.call("GetRoomConfig");
   }
 
   function getCompNum() {
@@ -223,10 +172,6 @@ QtObject {
 
   function setPlayerGameData(pid, data) {
     return Lua.call("SetPlayerGameData", pid, data);
-  }
-
-  function filterMyHandcards() {
-    return Lua.call("FilterMyHandcards");
   }
 
   function setObserving(o) {
@@ -315,14 +260,6 @@ QtObject {
 
   function finishRequestUI() {
     return Lua.call("FinishRequestUI");
-  }
-
-  function cardVisibility(cardId) {
-    return Lua.call("CardVisibility", cardId);
-  }
-
-  function isMyBuddy(me, other) {
-    return Lua.call("IsMyBuddy", me, other);
   }
 
   function hasVisibleCard(me, other, special_name) {

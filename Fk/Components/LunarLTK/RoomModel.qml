@@ -48,7 +48,7 @@ QtObject {
 
   // 一秒5刷智慧
   function refreshData() {
-    drawPileNum = Ltk.client.draw_pile.length;
+    drawPileNum = Lua.client.draw_pile.length;
     for (const model of players) {
       model.refreshData();
     }
@@ -59,13 +59,16 @@ QtObject {
   }
 
   function initialize() {
-    Ltk.client = Lua.evaluate("ClientInstance");
     dashboardId = Self.id;
-    const data = Lua.call("GetRoomModelData");
-    playerNum = data.playerNum;
+    const luaPlayers = Lua.client.players;
+    playerNum = luaPlayers.length;
     const photoModelComponent = Qt.createComponent("Fk.Components.LunarLTK", "PhotoModel");
-    for (const player of data.players) {
-      const model = photoModelComponent.createObject(null, player);
+    for (const player of luaPlayers) {
+      const prop = player.__toqml().prop;
+      delete prop.scale;
+      delete prop.selectable;
+      delete prop.state;
+      const model = photoModelComponent.createObject(null, prop);
       model.index = players.length;
       players.push(model);
     }

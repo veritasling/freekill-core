@@ -19,7 +19,7 @@ Rectangle {
   visible: {
     if (root.dataModel.playerid === Self.id) return false;
     if (root.dataModel.handcards.length === 0) return false; // 优先绑定再判buddy，否则不会更新
-    if (!Ltk.isMyBuddy(Self.id, root.dataModel.playerid) &&
+    if (!Lua.selfPlayer.isBuddy(root.dataModel.luaPlayer) &&
     !Ltk.hasVisibleCard(Self.id, root.dataModel.playerid)) return false;
     return true;
   }
@@ -36,7 +36,7 @@ Rectangle {
           txt.push("...");
           break;
         }
-        if (!Ltk.cardVisibility(cid)) continue;
+        if (!Lua.selfPlayer.cardVisible(cid)) continue;
         const data = Ltk.getCardData(cid, true);
         let a = Lua.tr(data.name);
          if (a.length >= 2) {
@@ -70,7 +70,7 @@ Rectangle {
      onTapped: {
        const params = { name: "hand_card" };
        let data = root.dataModel.handcards;
-       data = data.filter((e) => Ltk.cardVisibility(e));
+       data = data.filter((e) => Lua.selfPlayer.cardVisible(e));
 
        params.ids = data;
 

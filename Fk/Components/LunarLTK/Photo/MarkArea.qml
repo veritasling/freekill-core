@@ -100,8 +100,8 @@ Item {
             return;
           } else {
             if (!root.parent.playerid) return;
-            let data = Ltk.getPile(root.parent.playerid, mark_name);
-            data = data.filter((e) => Ltk.cardVisibility(e));
+            let data = Ltk.getPlayer(root.parent.playerid).getPile(mark_name);
+            data = data.filter((e) => Lua.selfPlayer.cardVisible(e));
             if (data.length === 0)
               return;
 

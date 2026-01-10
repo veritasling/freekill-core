@@ -6,6 +6,7 @@ QtObject {
   id: root
 
   property var photoItem
+  property var luaPlayer: Ltk.getPlayer(playerid)
 
   property int index: 0 // photo们在屏幕内的排位 用于arrangePhotos
 
@@ -37,6 +38,7 @@ QtObject {
 
   // 一些并非是固定值的角色属性，需随时刷新的玩意
   property int maxCard: 0
+  property int distance: -1
   property bool role_shown: false
   property list<int> handcards
 
@@ -44,14 +46,12 @@ QtObject {
   property var targetTip: []
 
   function updateHandcards() {
-    handcards = Ltk.getPlayerHandcards(playerid);
+    handcards = luaPlayer.getCardIds("h");
   }
 
   function refreshData() {
-    const p = Ltk.getPlayer(playerid);
-    const me = Ltk.getPlayer(Self.id);
-    maxCard = p.getMaxCards();
-    role_shown = me.roleVisible(p);
+    maxCard = luaPlayer.getMaxCards();
+    role_shown = Lua.selfPlayer.roleVisible(luaPlayer);
     handcardsChanged();
   }
 

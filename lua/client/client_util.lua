@@ -125,14 +125,6 @@ function GetCardExtensionByName(cardName)
   return card and card.package.extensionName or ""
 end
 
-function GetAllMods()
-  return Fk.extensions
-end
-
-function GetAllModNames()
-  return Fk.extension_names
-end
-
 function GetAllGeneralPack()
   local ret = {}
   for _, name in ipairs(Fk.package_names) do
@@ -367,34 +359,6 @@ function GetCards(pack_name)
   return ret
 end
 
-function GetCardSkill(cid)
-  return Fk:getCardById(cid).skill and Fk:getCardById(cid).skill.name or ""
-end
-
-function GetCardSpecialSkills(cid)
-  return Fk:getCardById(cid).special_skills or Util.DummyTable
-end
-
-function DistanceTo(from, to)
-  local a = ClientInstance:getPlayerById(from)
-  local b = ClientInstance:getPlayerById(to)
-  return a:distanceTo(b)
-end
-
-function GetPile(id, name)
-  return ClientInstance:getPlayerById(id):getPile(name) or Util.DummyTable
-end
-
-function GetAllPiles(id)
-  return ClientInstance:getPlayerById(id).special_cards or Util.DummyTable
-end
-
-function GetMySkills()
-  return table.map(Self.player_skills, function(s)
-    return s.visible and s.name or nil
-  end)
-end
-
 function GetPlayerSkills(id)
   local p = ClientInstance:getPlayerById(id)
   if p == Self then
@@ -441,15 +405,6 @@ function GetSkillData(skill_name)
     frequency = frequency,
     switchSkillName = (skill:hasTag(Skill.Switch) or skill:hasTag(Skill.Rhyme)) and skill:getSkeleton().name or "",
     isViewAsSkill = skill:isInstanceOf(ViewAsSkill),
-  }
-end
-
-function GetSkillStatus(skill_name)
-  local player = Self
-  local skill = Fk.skills[skill_name]
-  return {
-    locked = not skill:isEffectable(player),
-    times = skill:getTimes(player)
   }
 end
 
@@ -523,24 +478,6 @@ function GetGameModes()
   return ret
 end
 
-function GetPlayerHandcards(pid)
-  local c = ClientInstance
-  local p = c:getPlayerById(pid)
-  return p and p.player_cards[Player.Hand] or ""
-end
-
-function GetPlayerEquips(pid)
-  local c = ClientInstance
-  local p = c:getPlayerById(pid)
-  return p.player_cards[Player.Equip]
-end
-
-function GetPlayerJudges(pid)
-  local c = ClientInstance
-  local p = c:getPlayerById(pid)
-  return p.player_cards[Player.Judge]
-end
-
 -- 重新创建Lua client，但是继承ClientBase之类的数据，将和游戏状态有关的数据抹杀
 -- 继承的数据只要足以支持等待界面的房间就行
 function ResetClientLua()
@@ -578,10 +515,6 @@ function ResetClientLua()
   ClientInstance = self
 end
 
-function GetRoomConfig()
-  return ClientInstance.settings
-end
-
 function GetCompNum()
   local c = ClientInstance
   local mode = Fk.game_modes[c:getSettings('gameMode')] or Fk.game_modes["aaa_role_mode"]
@@ -614,10 +547,6 @@ function SetPlayerGameData(pid, data)
   p.player:setGameData(total, win, run)
   table.insert(data, 1, pid)
   ClientInstance:notifyUI("UpdateGameData", data)
-end
-
-function FilterMyHandcards()
-  Self:filterHandcards()
 end
 
 function SetObserving(o)
@@ -1177,19 +1106,6 @@ function FinishRequestUI()
   end
 end
 
-function CardVisibility(cardId)
-  local player = Self
-  local card = Fk:getCardById(cardId)
-  if not card then return false end
-  return player:cardVisible(cardId)
-end
-
-function IsMyBuddy(me, other)
-  local from = ClientInstance:getPlayerById(me)
-  local to = ClientInstance:getPlayerById(other)
-  return from and to and from:isBuddy(to)
-end
-
 -- special_name 为nil时是手牌
 function HasVisibleCard(me, other, special_name)
   local from = ClientInstance:getPlayerById(me)
@@ -1232,7 +1148,6 @@ function RefreshStatusSkills()
   end
 
   -- 刷自己的手牌
-  Self:filterHandcards()
   self:notifyUI("UpdateHandcard")
 
   -- 刷技能状态
@@ -1324,30 +1239,6 @@ function GetUIDataOfSettings(mode, settings, isBoardGame)
 
   if not ui_settings then return {} end
   return W.toQmlData(ui_settings, settings)
-end
-
--- 用于配合PhotoModel.qml的数据
-function GetPhotoData(pid)
-  local room = ClientInstance --[[@as Client]]
-  local player = room:getPlayerById(pid)
-
-  local data = player:__toqml().prop -- 啧。。。
-  data.scale = nil
-  data.selectable = nil
-  data.state = nil
-  return data
-end
-
--- 用于配合RoomModel.qml的数据
-function GetRoomModelData()
-  local room = ClientInstance --[[@as Client]]
-
-  return {
-    playerNum = #room.players,
-    players = table.map(room.players, function(p)
-      return GetPhotoData(p.id)
-    end),
-  }
 end
 
 dofile "lua/client/i18n/init.lua"

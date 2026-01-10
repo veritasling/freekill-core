@@ -27,7 +27,6 @@ PhotoBase {
   dead: dataModel.dead
 
   property string status: "normal"
-  property int distance: -1
 
   property alias areasSealed: equipAreaItem
   property alias markArea: markAreaItem
@@ -173,7 +172,7 @@ PhotoBase {
 
     function updatePileInfo(areaName) {
       if (areaName.startsWith('#')) return;
-      const data = Ltk.getPile(root.playerid, areaName);
+      const data = root.dataModel.luaPlayer.getPile(areaName);
       if (data.length === 0) {
         root.markArea.removeMark(areaName);
       } else {
@@ -467,9 +466,9 @@ PhotoBase {
     color: "white"
     height: 15
     width: 15
-    visible: root.distance != -1
+    visible: root.dataModel.distance != -1
     Text {
-      text: root.distance
+      text: root.dataModel.distance
       anchors.centerIn: parent
     }
   }

@@ -469,10 +469,9 @@ W.PageBase {
 
   function loadPackages() {
     if (loaded) return;
-    const _mods = Ltk.getAllModNames();
-    const modData = Ltk.getAllMods();
+    const modData = Lua.fk.extensions;
     const packs = Ltk.getAllGeneralPack();
-    _mods.forEach(name => {
+    Lua.fk.extension_names.forEach(name => {
       const pkgs = modData[name].filter(p => packs.includes(p)
         && !Config.serverHiddenPacks.includes(p));
       if (pkgs.length > 0)

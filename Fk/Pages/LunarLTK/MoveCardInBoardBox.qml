@@ -105,7 +105,7 @@ GraphicsBox {
       suit: modelData.suit
       number: modelData.number
       virt_name: modelData.virt_name || ''
-      known: Ltk.cardVisibility(modelData.cid)
+      known: Lua.selfPlayer.cardVisible(modelData.cid)
 
       selectable: !result || result.item === this
       onClicked: {

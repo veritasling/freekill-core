@@ -134,7 +134,7 @@ function replyToServer(jsonData) {
 }
 
 function getPhoto(id) {
-  return dataModel.getPhoto(id).photoItem;
+  return dataModel.getPhoto(id)?.photoItem;
 }
 
 function getAreaItem(area, id) {
@@ -614,7 +614,7 @@ callbacks["UpdateHandcard"] = (sender) => {
     const id = v.cid;
     if (Lua.evaluate(`ClientInstance:getCardArea(${id}) == Card.PlayerHand and ClientInstance:getCardOwner(${id}) == Self`)) {
       v.setData(Ltk.getCardData(id, true));
-      v.known = Ltk.cardVisibility(id);
+      v.known = Lua.selfPlayer.cardVisible(id);
       v.draggable = true;
     }
   });
@@ -656,9 +656,10 @@ callbacks["UpdateSkill"] = (sender, j) => {
   for (const skills of all_skills) {
     for (let i = 0; i < skills.count; i++) {
       const item = skills.itemAt(i);
-      const dat = Ltk.getSkillStatus(item.orig);
-      item.locked = dat.locked;
-      item.times = dat.times;
+      const p = Lua.selfPlayer;
+      const skill = Ltk.getSkill(item.orig);
+      item.locked = !skill.isEffectable(p);
+      item.times = skill.getTimes(p);
     }
   }
 }

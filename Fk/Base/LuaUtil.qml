@@ -17,6 +17,11 @@ QtObject {
     },
   };
 
+  // 以下都在Lobby.qml加载
+  property var client // ClientInstance
+  property var selfPlayer // Self
+  property var fk // 即Lua里面的Fk
+
   // Backend已提供的C++方法，简单封装
   function call(funcName, ...params) {
     return backend.callLuaFunction(funcName, [...params]);
@@ -47,29 +52,7 @@ QtObject {
     })`);
   }
 
-  // 求值一个Lua中的exp
-  // - 若为基本类型，直接返回相关值
-  // - 若为userdata或协程，则无法求出，返回null
-  // - 若为function，用Lua.fn包裹
-  // - 若为表：
-  //   - 若为能被JSON编码的简单表，基于JSON返回对应的Js值
-  //   - 其他情况返回Proxy
-  //
-  // Proxy可以像Lua对象那样读取属性、调用方法，但有这些限制：
-  // - 不能返回不为方法的function，所有function视为方法
-  // - 其他情况下，如果返回值不能被cbor编码，则会为null
-  function evaluate(exp) {
-    const luaType = _eval(`type(${exp})`);
-    if (luaType === "userdata" || luaType === "thread") {
-      return null;
-    }
-    if (luaType === "function") {
-      return fn(exp);
-    }
-    if (luaType !== "table") return _eval(exp);
-
-    const isClass = _eval(`not not ${exp}.class`);
-    if (!isClass) return _eval(exp);
+  function createProxy(exp) {
     return new Proxy({
       toString: () => _eval(`tostring(${exp})`),
       _L: exp,
@@ -85,27 +68,67 @@ QtObject {
             return { tp, nil }
           end
 
-          if type(v) == "table" and v.class then
-            -- 这里返回v的话，会在QML中作为ArrayBuffer
-            return { "class", v.__tocbor and v or nil }
+          if type(v) == "table" then
+            if v.class then
+              return { "class", v }
+            elseif v[1] and type(v[1]) == "table" and v[1].class then
+              return { "classArray", v }
+            end
           end
           return { tp, v }
         end`)(prop);
         if (tp === "function") {
           return fn(`function(...) return ${exp}:${prop}(...) end`);
         } else if (tp === "class") {
-          if (v instanceof ArrayBuffer) {
-            const u8 = new Uint8Array(v);
-            let binStr = "";
-            for (const u of u8) {
-              binStr += "\\x" + u.toString(16).padStart(2, "0");
-            }
-            return evaluate(`cbor.decode('${binStr}')`);
-          }
+          return createProxyFromCbor(v);
+        } else if (tp === "classArray") {
+          return v.map(createProxyFromCbor);
         } else {
           return v;
         }
       }
     });
+  }
+
+  function createProxyFromCbor(v) {
+    const u8 = new Uint8Array(v);
+    let binStr = "";
+    for (const u of u8) {
+      binStr += "\\x" + u.toString(16).padStart(2, "0");
+    }
+    return createProxy(`cbor.decode('${binStr}')`);
+  }
+
+  // 求值一个Lua中的exp
+  // - 若为基本类型，直接返回相关值
+  // - 若为userdata或协程，则无法求出，返回null
+  // - 若为function，用Lua.fn包裹
+  // - 若为表：
+  //   - 若为能被JSON编码的简单表，基于JSON返回对应的Js值
+  //   - 类实例或数组，返回Proxy或数组
+  //
+  // Proxy可以像Lua对象那样读取属性、调用方法，但有这些限制：
+  // - 不能返回不为方法的function，所有function视为方法
+  // - 其他情况下，如果返回值不能被cbor编码，则会为null
+  function evaluate(exp) {
+    const luaType = _eval(`type(${exp})`);
+    if (luaType === "userdata" || luaType === "thread") {
+      return null;
+    }
+    if (luaType === "function") {
+      return fn(exp);
+    }
+    if (luaType !== "table") return _eval(exp);
+
+    const isClass = _eval(`not not ${exp}.class`);
+    const isClassArr = _eval(`not not (${exp}[1] and ${exp}[1].class)`);
+    if (!isClass && !isClassArr) return _eval(exp);
+    
+    if (isClass) {
+      return createProxy(exp);
+    }
+    if (isClassArr) {
+      return _eval(exp).map(createProxyFromCbor);
+    }
   }
 }

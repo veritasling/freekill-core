@@ -220,7 +220,7 @@ W.PageBase {
       audioRow.clear();
       cardText.append(Lua.tr(":" + data.name));
       addCardAudio(data)
-      const skills = Ltk.getCardSpecialSkills(cid);
+      const skills = Ltk.getCard(cid).special_skills || [];
       if (skills.length > 0) {
         cardText.append("<br/>" + Lua.tr("Special card skills:"));
         skills.forEach(t => {

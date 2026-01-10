@@ -246,6 +246,8 @@ Flickable {
     if (id === 0 || id === undefined) return;
     root.pid = id;
     root.isObserving = !hasPhoto && !!extra_data.observing;
+    const player = Ltk.getPlayer(id);
+    const self = Lua.selfPlayer;
 
     avatar.general = hasPhoto? extra_data.photo.avatar : extra_data.avatar;
     screenName.text = hasPhoto? extra_data.photo.screenName : extra_data.screenName;
@@ -288,11 +290,11 @@ Flickable {
       skillDesc.append(skillText);
     });
 
-    var ej = Ltk.getPlayerEquips(id).concat(Ltk.getPlayerJudges(id));
+    const ej = player.getCardIds("ej");
     let unknownCardsNum = 0;
     ej.forEach(cid => {
       const t = Ltk.getCardData(cid);
-      if (Ltk.cardVisibility(cid)) {
+      if (self.cardVisible(cid)) {
         skillDesc.append("------------------------------------")
         const v = Ltk.getVirtualEquipData(id, cid);
         if (v) {

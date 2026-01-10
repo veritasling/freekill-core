@@ -1,6 +1,6 @@
 module Fk.Components.LunarLTK
 
-singleton Ltk 1.0 LTKLuaUtil.qml
+singleton Ltk 1.0 LtkLuaUtil.qml
 RoomModel 1.0 RoomModel.qml
 PhotoModel 1.0 PhotoModel.qml
 
