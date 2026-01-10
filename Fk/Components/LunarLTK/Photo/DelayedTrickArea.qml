@@ -5,7 +5,8 @@ import Fk
 import Fk.Components.LunarLTK
 
 Item {
-  property bool sealed: parent.sealedSlots.includes("JudgeSlot")
+  required property PhotoModel dataModel
+  property bool sealed: dataModel.sealedSlots.includes("JudgeSlot")
   property var cids: ({})
 
   Image {

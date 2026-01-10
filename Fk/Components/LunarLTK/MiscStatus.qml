@@ -3,23 +3,13 @@ import Fk
 
 Item {
   id: root
-  property int pileNum: 0
-  property int roundNum: 0
-  property int playedTime: 0
-  visible: roundNum || pileNum
-
-  function getTimeString(time) {
-    let s = time % 60;
-    s < 10 && (s = '0' + s);
-    const m = (time - s) / 60;
-    const h = (time - s - m * 60) / 3600;
-    return h ? `${h}:${m}:${s}` : `${m}:${s}`;
-  }
+  required property RoomModel dataModel
+  visible: dataModel.roundCount || dataModel.drawPileNum
 
   Text {
     id: roundTxt
     anchors.right: parent.right
-    text: Lua.tr("#currentRoundNum").arg(roundNum)
+    text: Lua.tr("#currentRoundNum").arg(root.dataModel.roundCount)
     color: "#F0E5DA"
     font.pixelSize: 18
     font.family: Config.libianName
@@ -36,15 +26,16 @@ Item {
     font.family: Config.libianName
     style: Text.Outline
     styleColor: "#3D2D1C"
+    text: root.dataModel.getTimeString(root.dataModel.playedTime);
   }
 
+  // FIXME: 杀了这个timer 在刷状态技那里改Model的数据才对
   Timer {
     interval: 1000
     running: true
     repeat: true
     onTriggered: {
-      playedTime++;
-      timeTxt.text = getTimeString(playedTime);
+      root.dataModel.playedTime++;
     }
   }
 
@@ -65,6 +56,6 @@ Item {
     font.pixelSize: 32
     color: "white"
     style: Text.Outline
-    text: pileNum.toString()
+    text: root.dataModel.drawPileNum.toString()
   }
 }

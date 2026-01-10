@@ -1351,4 +1351,28 @@ function GetUIDataOfSettings(mode, settings, isBoardGame)
   return W.toQmlData(ui_settings, settings)
 end
 
+-- 用于配合PhotoModel.qml的数据
+function GetPhotoData(pid)
+  local room = ClientInstance --[[@as Client]]
+  local player = room:getPlayerById(pid)
+
+  local data = player:__toqml().prop -- 啧。。。
+  data.scale = nil
+  data.selectable = nil
+  data.state = nil
+  return data
+end
+
+-- 用于配合RoomModel.qml的数据
+function GetRoomModelData()
+  local room = ClientInstance --[[@as Client]]
+
+  return {
+    playerNum = #room.players,
+    players = table.map(room.players, function(p)
+      return GetPhotoData(p.id)
+    end),
+  }
+end
+
 dofile "lua/client/i18n/init.lua"

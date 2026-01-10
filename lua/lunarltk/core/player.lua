@@ -151,13 +151,14 @@ function Player:__toqml()
     -- 屋檐了，烂QML
     prop = {
       playerid = self.id,
+      avatar = self.player:getAvatar(),
+      screenName = self.player:getScreenName(),
+
       scale = 0.55,
       general = self.general,
       deputyGeneral = self.deputyGeneral,
       role = self.role,
       state = "candidate",
-      avatar = self.player:getAvatar(),
-      screenName = self.player:getScreenName(),
       kingdom = self.kingdom,
       seatNumber = self.seat == 0 and 1 or self.seat,
       selectable = true,

@@ -7,21 +7,22 @@ import Fk.Components.LunarLTK
 
 Column {
   id: root
-  property int maxValue: 4
-  property int value: 4
+
   property var colors: ["#F4180E", "#F4180E", "#E3B006", "#25EC27"]
-  property int shieldNum: 0
+  required property PhotoModel dataModel
 
   Shield {
     id: shield
-    value: shieldNum
+    value: root.dataModel.shield
   }
 
   Repeater {
     id: repeater
-    model: column.visible ? 0 : maxValue
+    model: column.visible ? 0 : root.dataModel.maxHp
     Magatama {
       state: {
+        const value = root.dataModel.hp;
+        const maxValue = root.dataModel.maxHp;
         if (maxValue - 1 - index >= value) {
           return 0;
         } else if (value >= 3 || value >= maxValue) {
@@ -37,26 +38,36 @@ Column {
 
   Column {
     id: column
-    visible: maxValue > 4 || value > maxValue ||
-             (shieldNum > 0 && maxValue > 3)
+    visible: {
+      const maxHp = root.dataModel.maxHp;
+      const hp = root.dataModel.maxHp;
+      const shield = root.dataModel.shield;
+      return maxHp > 4 || hp > maxHp || (shield > 0 && maxHp > 3)
+    }
     spacing: -4
 
     Magatama {
-      state: (value >= 3 || value >= maxValue) ? 3 : (value <= 0 ? 0 : value)
+      state: {
+        const maxHp = root.dataModel.maxHp;
+        const hp = root.dataModel.maxHp;
+        return (hp >= 3 || hp >= maxHp) ? 3 : (hp <= 0 ? 0 : hp)
+      }
     }
 
     GlowText {
       id: hpItem
       width: root.width
-      text: value
+      text: root.dataModel.hp
       color: {
         let idx;
-        if (value >= 3 || value >= maxValue) {
+        const hp = root.dataModel.hp;
+        const maxHp = root.dataModel.maxHp;
+        if (hp >= 3 || hp >= maxHp) {
           idx = 3;
-        } else if (value <= 0) {
+        } else if (hp <= 0) {
           idx = 0;
         } else {
-          idx = value;
+          idx = hp;
         }
         return root.colors[idx];
       }
@@ -93,7 +104,7 @@ Column {
     GlowText {
       id: maxHpItem
       width: root.width
-      text: maxValue
+      text: root.dataModel.maxHp
       color: hpItem.color
       font: hpItem.font
       horizontalAlignment: hpItem.horizontalAlignment

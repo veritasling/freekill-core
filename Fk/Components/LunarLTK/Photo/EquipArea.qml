@@ -17,6 +17,9 @@ Item {
 
   height: 53
   width: 103
+
+  required property PhotoModel dataModel
+
   property int itemHeight: {
     if (treasureItem.name === "" && !treasureItem.sealed)
       return height / 3;
@@ -47,7 +50,7 @@ Item {
       width: parent.width
       height: (name === "" && !sealed) ? 0 : itemHeight
       opacity: 0
-      sealed: root.parent.sealedSlots.includes('TreasureSlot')
+      sealed: root.dataModel.sealedSlots.includes('TreasureSlot')
     }
 
     EquipItem {
@@ -56,7 +59,7 @@ Item {
       width: parent.width
       height: itemHeight
       opacity: 0
-      sealed: root.parent.sealedSlots.includes('WeaponSlot')
+      sealed: root.dataModel.sealedSlots.includes('WeaponSlot')
     }
 
     EquipItem {
@@ -65,7 +68,7 @@ Item {
       width: parent.width
       height: itemHeight
       opacity: 0
-      sealed: root.parent.sealedSlots.includes('ArmorSlot')
+      sealed: root.dataModel.sealedSlots.includes('ArmorSlot')
     }
 
     Row {
@@ -82,7 +85,7 @@ Item {
           height: itemHeight
           icon: "horse"
           opacity: 0
-          sealed: root.parent.sealedSlots.includes('DefensiveRideSlot')
+          sealed: root.dataModel.sealedSlots.includes('DefensiveRideSlot')
         }
       }
 
@@ -96,7 +99,7 @@ Item {
           height: itemHeight
           icon: "horse"
           opacity: 0
-          sealed: root.parent.sealedSlots.includes('OffensiveRideSlot')
+          sealed: root.dataModel.sealedSlots.includes('OffensiveRideSlot')
         }
       }
     }
@@ -110,7 +113,7 @@ Item {
     if (inputs instanceof Array) {
       for (let i = 0; i < inputs.length; i++) {
         card = inputs[i];
-        const vcard = Ltk.getVirtualEquipData(parent.playerid, card.cid);
+        const vcard = Ltk.getVirtualEquipData(dataModel.playerid, card.cid);
         card = vcard || card;
         item = items[subtypes.indexOf(card.subtype)];
         if (item) {
@@ -120,7 +123,7 @@ Item {
       }
     } else {
       card = inputs;
-      const vcard = Ltk.getVirtualEquipData(parent.playerid, card.cid);
+      const vcard = Ltk.getVirtualEquipData(dataModel.playerid, card.cid);
       card = vcard || card;
       item = items[subtypes.indexOf(card.subtype)];
       if (item) {

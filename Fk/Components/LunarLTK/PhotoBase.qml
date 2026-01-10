@@ -17,6 +17,7 @@ Game.BasicItem {
   property int playerid: 0
   property string avatar: ""
   property string screenName: ""
+
   property string general: ""
   property string deputyGeneral: ""
   property string kingdom: "qun"

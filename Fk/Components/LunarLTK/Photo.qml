@@ -13,31 +13,24 @@ import Fk.Widgets as W
 PhotoBase {
   id: root
 
-  property string role: "unknown"
-  property bool role_shown: false
-  property string netstate: "online"
-  property int handcards: 0
-  property int maxHp: 0
-  property int hp: 0
-  property int shield: 0
-  property bool dying: false
-  property bool faceup: true
-  property bool chained: false
-  property int drank: 0
-  property int rest: 0
-  property list<string> sealedSlots: []
+  required property PhotoModel dataModel
+  onDataModelChanged: dataModel.photoItem = root;
 
+  playerid: dataModel.playerid
+  avatar: dataModel.avatar
+  screenName: dataModel.screenName
+  general: dataModel.general
+  deputyGeneral: dataModel.deputyGeneral
+  kingdom: dataModel.kingdom
+
+  property int handcards: 0
   property int distance: -1
   property string status: "normal"
   property int maxCard: 0
 
-  property alias handcardArea: handcardAreaItem
-  property alias equipArea: equipAreaItem
   property alias areasSealed: equipAreaItem
   property alias markArea: markAreaItem
   property alias picMarkArea: picMarkAreaItem
-  property alias delayedTrickArea: delayedTrickAreaItem
-  property alias specialArea: specialAreaItem
 
   property alias progressBar: progressBar
   property alias progressTip: progressTip.text
@@ -81,20 +74,19 @@ PhotoBase {
   HpBar {
     id: hp
     x: 6
-    value: root.hp
-    maxValue: root.maxHp
-    shieldNum: root.shield
     anchors.bottom: parent.bottom
     anchors.bottomMargin: 27
+
+    dataModel: root.dataModel
   }
 
   Rectangle {
     anchors.fill: root.photoMask
     radius: 6
 
-    // visible: root.drank > 0
+    // visible: root.dataModel.drank > 0
     color: "red"
-    opacity: (root.drank <= 0 ? 0 : 0.4) + Math.log(root.drank) * 0.12
+    opacity: (root.dataModel.drank <= 0 ? 0 : 0.4) + Math.log(root.dataModel.drank) * 0.12
     Behavior on opacity { NumberAnimation { duration: 300 } }
   }
 
@@ -102,7 +94,7 @@ PhotoBase {
     id: restRect
     anchors.centerIn: photoMask
     anchors.leftMargin: 15
-    visible: root.rest > 0
+    visible: root.dataModel.rest > 0
 
     GlowText {
       Layout.alignment: Qt.AlignCenter
@@ -117,8 +109,8 @@ PhotoBase {
 
     GlowText {
       Layout.alignment: Qt.AlignCenter
-      visible: root.rest > 0 && root.rest < 999
-      text: root.rest
+      visible: root.dataModel.rest > 0 && root.dataModel.rest < 999
+      text: root.dataModel.rest
       font.family: Config.libianName
       font.pixelSize: 25
       font.bold: true
@@ -129,7 +121,7 @@ PhotoBase {
 
     GlowText {
       Layout.alignment: Qt.AlignCenter
-      visible: root.rest > 0 && root.rest < 999
+      visible: root.dataModel.rest > 0 && root.dataModel.rest < 999
       text: Lua.tr("rest round num")
       font.family: Config.libianName
       font.pixelSize: 21
@@ -157,7 +149,7 @@ PhotoBase {
 
   Image {
     id: turnedOver
-    visible: !root.faceup
+    visible: !root.dataModel.faceup
     source: SkinBank.photoDir + "faceturned" + (Config.heg ? '-heg' : '')
     x: 22; y: 4
     scale: 0.75
@@ -169,6 +161,8 @@ PhotoBase {
 
     x: 23
     y: 118
+
+    dataModel: root.dataModel
   }
 
   Item {
@@ -216,7 +210,7 @@ PhotoBase {
 
   Image {
     id: chain
-    visible: root.chained
+    visible: root.dataModel.chained
     source: SkinBank.photoDir + "chain"
     anchors.horizontalCenter: parent.horizontalCenter
     scale: 0.75
@@ -225,12 +219,12 @@ PhotoBase {
 
   Image {
     // id: saveme
-    visible: (root.dead && !root.rest) || root.dying || root.surrendered
+    visible: (root.dataModel.dead && !root.dataModel.rest) || root.dataModel.dying || root.surrendered
     source: {
       if (root.surrendered) {
         return SkinBank.deathDir + "surrender";
-      } else if (root.dead) {
-        return SkinBank.getRoleDeathPic(root.role);
+      } else if (root.dataModel.dead) {
+        return SkinBank.getRoleDeathPic(root.dataModel.role);
       }
       return SkinBank.deathDir + "saveme";
     }
@@ -240,7 +234,7 @@ PhotoBase {
 
   Image {
     id: netstat
-    source: SkinBank.stateDir + root.netstate
+    source: SkinBank.stateDir + root.dataModel.netstate
     x: photoMask.x
     y: photoMask.y
     scale: 0.9 * 0.75
@@ -260,7 +254,7 @@ PhotoBase {
       text: {
         let n = root.handcards;
         n = Ltk.getPlayerHandcards(root.playerid).length;
-        if (root.maxCard === root.hp || root.hp < 0) {
+        if (root.maxCard === root.dataModel.hp || root.dataModel.hp < 0) {
           return n;
         } else {
           const maxCard = root.maxCard < 900 ? root.maxCard : "∞";
@@ -268,7 +262,7 @@ PhotoBase {
         }
       }
       font.family: Config.libianName
-      font.pixelSize: (root.maxCard === root.hp || root.hp < 0 ) ? 24 : 20
+      font.pixelSize: (root.maxCard === root.dataModel.hp || root.dataModel.hp < 0 ) ? 24 : 20
       //font.weight: 30
       color: "white"
       anchors.horizontalCenter: parent.horizontalCenter
@@ -285,9 +279,9 @@ PhotoBase {
   RoleComboBox {
     id: role
     value: {
-      if (root.role === "hidden") return "hidden";
-      if (root.role_shown) return root.role;
-      Ltk.roleVisibility(root.playerid) ? root.role : "unknown";
+      if (root.dataModel.role === "hidden") return "hidden";
+      if (root.dataModel.role_shown) return root.dataModel.role;
+      Ltk.roleVisibility(root.playerid) ? root.dataModel.role : "unknown";
     }
     anchors.top: parent.top
     anchors.topMargin: -4
@@ -464,6 +458,8 @@ PhotoBase {
     id: delayedTrickAreaItem
     anchors.bottom: parent.bottom
     anchors.bottomMargin: 8
+
+    dataModel: root.dataModel
   }
 
   PicMarkArea {
@@ -524,5 +520,19 @@ PhotoBase {
     }
 
     roomScene.startCheat("PlayerDetail", { photo: this });
+  }
+
+  function getAreaItem(area) {
+    if (area === Ltk.Card.PlayerHand) {
+      return handcardAreaItem;
+    } else if (area === Ltk.Card.PlayerEquip) {
+      return equipAreaItem;
+    } else if (area === Ltk.Card.PlayerJudge) {
+      return delayedTrickAreaItem;
+    } else if (area === Ltk.Card.PlayerSpecial) {
+      return specialAreaItem;
+    }
+
+    return null;
   }
 }

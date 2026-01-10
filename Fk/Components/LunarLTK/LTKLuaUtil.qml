@@ -5,6 +5,30 @@ import QtQuick
 import Fk
 
 QtObject {
+
+  // 遵循Lua里面那样，把相关枚举全堆到这里
+  enum Card {
+    Spade = 1,
+    Club = 2,
+    Heart = 3,
+    Diamond = 4,
+    NoSuit = 5,
+    
+    Black = 1,
+    Red = 2,
+    NoColor = 3,
+
+    Unknown = 0,
+    PlayerHand = 1,
+    PlayerEquip = 2,
+    PlayerJudge = 3,
+    PlayerSpecial = 4,
+    Processing = 5,
+    DrawPile = 6,
+    DiscardPile = 7,
+    Void = 8
+  }
+
   ///////////////// 施工中 //////////////////////
   // 把client_util.lua公式化转了一遍。还没剔除
   ///////////////// 施工中 //////////////////////

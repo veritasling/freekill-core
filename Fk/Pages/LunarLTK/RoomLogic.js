@@ -2,18 +2,6 @@
 
 let callbacks={}
 
-const Card = {
-  Unknown : 0,
-  PlayerHand : 1,
-  PlayerEquip : 2,
-  PlayerJudge : 3,
-  PlayerSpecial : 4,
-  Processing : 5,
-  DrawPile : 6,
-  DiscardPile : 7,
-  Void : 8
-}
-
 function arrangeManyPhotos() {
   /* Layout of photos:
    * +----------------+
@@ -23,6 +11,7 @@ function arrangeManyPhotos() {
    * +----------------+
    */
 
+  const playerNum = roomScene.dataModel.playerNum;
   const photoBaseWidth = 175 * 0.75;
   const photoMaxWidth = 175 * 0.75;
   // const verticalSpacing = 32;
@@ -72,7 +61,7 @@ function arrangeManyPhotos() {
     if (!item)
       continue;
 
-    region = regions[photoModel.get(i).index];
+    region = regions[photoModel[i].index];
     item.x = region.x;
     item.y = region.y;
     item.scale = region.scale;
@@ -80,6 +69,7 @@ function arrangeManyPhotos() {
 }
 
 function arrangePhotos() {
+  const playerNum = roomScene.dataModel.playerNum;
   if (playerNum > 8) {
     return arrangeManyPhotos();
   }
@@ -132,7 +122,7 @@ function arrangePhotos() {
     if (!item)
       continue;
 
-    region = regions[seatIndex[photoModel.get(i).index]];
+    region = regions[seatIndex[photoModel[i].index]];
     item.x = region.x;
     item.y = region.y;
   }
@@ -143,34 +133,16 @@ function replyToServer(jsonData) {
   roomScene.state = "notactive";
 }
 
-function getPhotoModel(id) {
-  for (let i = 0; i < photoModel.count; i++) {
-    const item = photoModel.get(i);
-    if (item.id === id) {
-      return item;
-    }
-  }
-  return undefined;
-}
-
 function getPhoto(id) {
-  for (let i = 0; i < photoModel.count; i++) {
-    const item = photoModel.get(i);
-    if (item.id === id) {
-      return photos.itemAt(i);
-    }
-  }
-  return undefined;
+  return dataModel.getPhoto(id).photoItem;
 }
 
 function getAreaItem(area, id) {
-  if (area === Card.DrawPile) {
+  if (area === Ltk.Card.DrawPile) {
     return drawPile;
-  } else if (area === Card.DiscardPile || area === Card.Processing ||
-             area === Card.Void) {
+  } else if (area === Ltk.Card.DiscardPile || area === Ltk.Card.Processing ||
+             area === Ltk.Card.Void) {
     return tablePile;
-  } else if (area === Card.AG) {
-    return popupBox.item;
   }
 
   const photo = getPhoto(id);
@@ -178,17 +150,11 @@ function getAreaItem(area, id) {
     return null;
   }
 
-  if (area === Card.PlayerHand) {
-    return id === Self.id ? dashboard.handcardArea : photo.handcardArea;
-  } else if (area === Card.PlayerEquip) {
-    return photo.equipArea;
-  } else if (area === Card.PlayerJudge) {
-    return photo.delayedTrickArea;
-  } else if (area === Card.PlayerSpecial) {
-    return photo.specialArea;
+  if (area === Ltk.Card.PlayerHand && id === Self.id) {
+    return dashboard.handcardArea;
   }
 
-  return null;
+  return photo.getAreaItem(area);
 }
 
 function moveCards(data) {
@@ -197,7 +163,7 @@ function moveCards(data) {
     const move = moves[i];
     const from = getAreaItem(move.fromArea, move.from);
     const to = getAreaItem(move.toArea, move.to);
-    if (!from || !to || (from === to && from !== tablePile) || (from === tablePile && move.toArea === Card.DiscardPile))
+    if (!from || !to || (from === to && from !== tablePile) || (from === tablePile && move.toArea === Ltk.Card.DiscardPile))
       continue;
     const items = from.remove(move.ids, move.fromSpecialName, data);
     items.forEach((item) => item.known = !!data[item.cid.toString()]); // updata card visible. must be before move animation
@@ -243,13 +209,13 @@ function sortHandcards(sortMethods) {
   let sortedStatus = [];
 
   const subtypeString2Number = {
-    ["none"]: Card.SubtypeNone,
-    ["delayed_trick"]: Card.SubtypeDelayedTrick,
-    ["weapon"]: Card.SubtypeWeapon,
-    ["armor"]: Card.SubtypeArmor,
-    ["defensive_ride"]: Card.SubtypeDefensiveRide,
-    ["offensive_ride"]: Card.SubtypeOffensiveRide,
-    ["treasure"]: Card.SubtypeTreasure,
+    ["none"]: Ltk.Card.SubtypeNone,
+    ["delayed_trick"]: Ltk.Card.SubtypeDelayedTrick,
+    ["weapon"]: Ltk.Card.SubtypeWeapon,
+    ["armor"]: Ltk.Card.SubtypeArmor,
+    ["defensive_ride"]: Ltk.Card.SubtypeDefensiveRide,
+    ["offensive_ride"]: Ltk.Card.SubtypeOffensiveRide,
+    ["treasure"]: Ltk.Card.SubtypeTreasure,
   }
 
   const others = [];
@@ -641,7 +607,6 @@ callbacks["MaxCard"] = (sender, data) => {
   const photo = getPhoto(id);
   if (photo) {
     photo.maxCard = cardMax;
-    photo.hp = hp;
   }
 }
 
@@ -651,12 +616,9 @@ callbacks["PropertyUpdate"] = (sender, data) => {
   const property_name = data[1];
   let value = data[2];
 
-  let model = getPhotoModel(uid);
+  let model = dataModel.getPhoto(uid);
 
-  if (typeof(model) !== "undefined") {
-    if (property_name == "sealedSlots")
-      value = JSON.stringify(value); // 辣鸡qml
-
+  if (typeof(model) !== "undefined" && property_name in model) {
     model[property_name] = value;
   }
 
@@ -723,8 +685,8 @@ callbacks["UpdateSkill"] = (sender, j) => {
 callbacks["StartGame"] = (sender, jsonData) => {
   roomScene.isStarted = true;
 
-  for (let i = 0; i < photoModel.count; i++) {
-    const item = photoModel.get(i);
+  for (let i = 0; i < photoModel.length; i++) {
+    const item = photoModel[i];
     item.ready = false;
     item.general = "";
   }
@@ -733,8 +695,8 @@ callbacks["StartGame"] = (sender, jsonData) => {
 callbacks["ArrangeSeats"] = (sender, order) => {
   // jsonData: seat order
 
-  for (let i = 0; i < photoModel.count; i++) {
-    const item = photoModel.get(i);
+  for (let i = 0; i < photoModel.length; i++) {
+    const item = photoModel[i];
     item.seatNumber = order.indexOf(item.id) + 1;
   }
 
@@ -744,8 +706,8 @@ callbacks["ArrangeSeats"] = (sender, order) => {
   after.push(...order);
   const photoOrder = after;
 
-  for (let i = 0; i < photoModel.count; i++) {
-    const item = photoModel.get(i);
+  for (let i = 0; i < photoModel.length; i++) {
+    const item = photoModel[i];
     item.index = photoOrder.indexOf(item.id);
   }
 
@@ -754,6 +716,7 @@ callbacks["ArrangeSeats"] = (sender, order) => {
 
 function cancelAllFocus() {
   let item;
+  const playerNum = roomScene.dataModel.playerNum;
   for (let i = 0; i < playerNum; i++) {
     item = photos.itemAt(i);
     item.progressBar.visible = false;
@@ -769,15 +732,14 @@ callbacks["MoveFocus"] = (sender, data) => {
   const timeout = data[2] ?? (Config.roomTimeout * 1000);
 
   let item, model;
-  for (let i = 0; i < playerNum; i++) {
-    model = photoModel.get(i);
-    if (focuses.indexOf(model.id) != -1) {
-      item = photos.itemAt(i);
-      item.progressBar.duration = timeout;
-      item.progressBar.visible = true;
-      item.progressTip = Lua.tr(command)
-        + Lua.tr(" thinking...");
-    }
+  for (const pid of focuses) {
+    const model = dataModel.getPhoto(pid);
+    if (!model) continue;
+    const item = model.photoItem;
+    item.progressBar.duration = timeout;
+    item.progressBar.visible = true;
+    item.progressTip = Lua.tr(command)
+      + Lua.tr(" thinking...");
   }
 }
 
@@ -786,9 +748,9 @@ callbacks["PlayerRunned"] = (sender, data) => {
   const runner = data[0];
   const robot = data[1];
 
-  const model = getPhotoModel(runner);
+  const model = dataModel.getPhoto(runner);
   if (typeof(model) !== "undefined") {
-    model.id = robot;
+    model.playerid = robot;
   }
 }
 
@@ -1519,12 +1481,12 @@ callbacks["UpdateLimitSkill"] = (sender, data) => {
 
 callbacks["UpdateDrawPile"] = (sender, j) => {
   const data = parseInt(j);
-  roomScene.miscStatus.pileNum = data;
+  roomScene.dataModel.drawPileNum = data;
 }
 
 callbacks["UpdateRoundNum"] = (sender, j) => {
   const data = parseInt(j);
-  roomScene.miscStatus.roundNum = data;
+  roomScene.dataModel.roundCount = data;
 }
 
 callbacks["ChangeSkin"] = (sender, data) => {
@@ -1549,9 +1511,9 @@ callbacks["ChangeSkin"] = (sender, data) => {
 // 神貂蝉
 callbacks["ChangeSelf"] = (sender, j) => {
   // move new selfPhoto to dashboard
-  let order = new Array(photoModel.count);
-  for (let i = 0; i < photoModel.count; i++) {
-    const item = photoModel.get(i);
+  let order = new Array(photoModel.length);
+  for (let i = 0; i < photoModel.length; i++) {
+    const item = photoModel[i];
     order[item.seatNumber - 1] = item.id;
     if (item.id === Self.id) {
       dashboard.self = photos.itemAt(i);
@@ -1612,5 +1574,5 @@ callbacks["AddNpc"] = (_, data) => {
   };
   photoModel.append(modelData);
 
-  playerNum = photoModel.count; //?
+  roomScene.dataModel.playerNum = photoModel.length; //?
 }

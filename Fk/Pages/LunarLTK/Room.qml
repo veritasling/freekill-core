@@ -15,9 +15,6 @@ import "RoomLogic.js" as Logic
 W.PageBase {
   id: roomScene
 
-  property int playerNum: 0
-  property int dashboardId: 0
-
   property alias popupBox: popupBox
   property alias manualBox: manualBox
   property alias bigAnim: bigAnim
@@ -31,7 +28,6 @@ W.PageBase {
   property alias dashboard: dashboard
   property alias drawPile: drawPile
   property alias skillInteraction: skillInteraction
-  property alias miscStatus: miscStatus
   property alias banner: banner
 
   // 权宜之计 后面全改
@@ -41,6 +37,13 @@ W.PageBase {
   property string responding_card
   property var extra_data: ({})
   property var skippedUseEventId: []
+
+  property alias dataModel: dataModel
+
+  RoomModel {
+    id: dataModel
+    roomPage: roomScene
+  }
 
   MediaPlayer {
     id: bgm
@@ -130,9 +133,7 @@ W.PageBase {
    * +---------------------+
    */
 
-  ListModel {
-    id: photoModel
-  }
+  property list<PhotoModel> photoModel
 
   Item {
     id: roomArea
@@ -143,27 +144,8 @@ W.PageBase {
       id: photos
       model: photoModel
       Photo {
-        playerid: model.id
-        general: model.general
-        avatar: model.avatar
-        deputyGeneral: model.deputyGeneral
-        screenName: model.screenName
-        role: model.role
-        role_shown: model.role_shown
-        kingdom: model.kingdom
-        netstate: model.netstate
-        maxHp: model.maxHp
-        hp: model.hp
-        shield: model.shield
-        seatNumber: model.seatNumber
-        dead: model.dead
-        dying: model.dying
-        faceup: model.faceup
-        chained: model.chained
-        drank: model.drank
-        rest: model.rest
-        surrendered: model.surrendered
-        sealedSlots: JSON.parse(model.sealedSlots)
+        required property PhotoModel modelData
+        dataModel: modelData
 
         onSelectedChanged: {
           if ( state === "candidate" )
@@ -178,10 +160,10 @@ W.PageBase {
         }
 
         Component.onCompleted: {
-          if (index === 0) {
-            dashboard.self = this;
-            enableChangeSkin = true;
-          }
+          // if (index === 0) {
+          //   dashboard.self = this;
+          //   enableChangeSkin = true;
+          // }
         }
       }
     }
@@ -621,11 +603,12 @@ W.PageBase {
   }
 
   MiscStatus {
-    id: miscStatus
     anchors.right: parent.right
     anchors.top: parent.top
     anchors.rightMargin: 108
     anchors.topMargin: 8
+
+    dataModel: roomScene.dataModel
   }
 
   PhotoElement.MarkArea {
@@ -855,9 +838,8 @@ W.PageBase {
     photo.handleMarkAreaUpdate(change);
   }
 
-  Component.onCompleted: {
+  function setupCallbacks() {
     addCallback(Command.NetStateChanged, netStateChanged);
-
     // TODO 摆烂了 反正这些后面也是得重构 懒得搬砖了
     addCallback(Command.SetCardFootnote, Logic.callbacks["SetCardFootnote"]);
     addCallback(Command.SetCardVirtName, Logic.callbacks["SetCardVirtName"]);
@@ -920,43 +902,16 @@ W.PageBase {
     addCallback("AddNpc", Logic.callbacks["AddNpc"]);
 
     addCallback(Command.UpdateMarkArea, updateMarkArea);
+  }
 
-    playerNum = Config.roomCapacity;
+  Component.onCompleted: {
+    setupCallbacks();
+    dataModel.initialize();
+
     bgm.play();
 
-    const luaSelfIdx = Lua.evaluate('table.indexOf(ClientInstance.players, Self)') - 1;
-
-    dashboardId = Self.id;
-    for (let i = 0; i < playerNum; i++) {
-      const state = Lua.evaluate(`ClientInstance.players[${(luaSelfIdx + i) % playerNum + 1}]:__toqml().prop`);
-      const modelData = {
-        id: i ? -1 : Self.id,
-        index: i,   // For animating seat swap
-        general: i ? "" : Self.avatar,
-        avatar: i ? "" : Self.avatar,
-        deputyGeneral: "",
-        screenName: i ? "" : Self.screenName,
-        role: "unknown",
-        role_shown: false,
-        kingdom: "unknown",
-        netstate: "online",
-        maxHp: 0,
-        hp: 0,
-        shield: 0,
-        seatNumber: i + 1,
-        dead: false,
-        dying: false,
-        faceup: true,
-        chained: false,
-        drank: 0,
-        rest: 0,
-        surrendered: false,
-        sealedSlots: "[]",
-      };
-      Object.assign(modelData, state);
-      modelData.id = state.playerid;
-
-      photoModel.append(modelData);
+    for (let i = 0; i < dataModel.playerNum; i++) {
+      photoModel.push(dataModel.players[i]);
     }
 
     Logic.arrangePhotos();
