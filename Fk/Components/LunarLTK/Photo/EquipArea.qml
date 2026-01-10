@@ -38,9 +38,7 @@ Item {
       anchors.centerIn: parent
       // checkExisting: true
       onLengthChanged: {
-        root.length = Lua.evaluate(`(function()
-        return #ClientInstance:getPlayerById(${root.parent.playerid}):getCardIds("e")
-        end)()`);
+        root.length = root.dataModel.luaPlayer.getCardIds("e");
       }
     }
 

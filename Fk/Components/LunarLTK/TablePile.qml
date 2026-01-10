@@ -23,13 +23,7 @@ Item {
 
   // FIXME: 重构需要
   function inTable(cid) {
-    return Lua.evaluate(`(function()
-      local client = Fk:currentRoom()
-      if table.contains(client.processing_area, ${cid}) then
-        return true
-      end
-      return false
-    end)()`)
+    return Lua.client.processing_area.includes(cid);
   }
 
   Timer {

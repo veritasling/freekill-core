@@ -212,10 +212,11 @@ Item {
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
-        if (Lua.evaluate('not ClientInstance.gameStarted')) {
+        if (!Lua.client.gameStarted) {
           return;
         }
-        if (Lua.evaluate('Self.dead and (Self.rest <= 0)')) {
+        const self = Lua.selfPlayer;
+        if (self.dead && self.rest <= 0) {
           return;
         }
         const surrenderCheck = Lua.call('CheckSurrenderAvailable');
@@ -513,7 +514,7 @@ Item {
               if (!Config.observing) return;
               if (observing) return;
               if (screenName == Self.screenName) return;
-              Lua.evaluate(`ClientInstance:changeSelf(${pid})`)
+              Lua.client.changeSelf(pid);
             }
           }
         }
@@ -752,7 +753,7 @@ Item {
     if (Config.replaying) {
       App.quitPage();
       Backend.controlReplayer("shutdown");
-    } else if (Config.observing || Lua.evaluate(`not ClientInstance.gameStarted`)) {
+    } else if (Config.observing || !Lua.client.gameStarted) {
       Cpp.notifyServer("QuitRoom", "");
     } else {
       quitDialog.open();

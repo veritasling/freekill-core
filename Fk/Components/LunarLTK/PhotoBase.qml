@@ -271,10 +271,7 @@ Game.BasicItem {
   }
 
   function getSkinsByName(general) {
-    let arr = Lua.evaluate(`(function()
-      return Fk:getSkinsByGeneral("${general}") or {}
-    end)()`);
-    return arr
+    return Lua.fk.getSkinsByGeneral(general) || [];
   }
 
   function getConfigSkin(general) {

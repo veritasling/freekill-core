@@ -27,7 +27,7 @@ QtObject {
     return backend.callLuaFunction(funcName, [...params]);
   }
 
-  function _eval(lua) {
+  function ev(lua) {
     return backend.evalLuaExp(`return ${lua}`);
   }
 
@@ -37,9 +37,9 @@ QtObject {
 
   // 将func（一个Lua函数字符串）包装成js函数。
   // js函数在调用时，会将参数表都翻译成Lua代码的形式，
-  // 最后拼出一个Lua函数调用的式子并_eval
+  // 最后拼出一个Lua函数调用的式子并ev
   function fn(func) {
-    return (...params) => _eval(`(${func})(${
+    return (...params) => ev(`(${func})(${
       [...params].map(v => {
         if (["string", "number", "boolean"].includes(typeof v)) return JSON.stringify(v);
         if (typeof v === "object") {
@@ -54,7 +54,7 @@ QtObject {
 
   function createProxy(exp) {
     return new Proxy({
-      toString: () => _eval(`tostring(${exp})`),
+      toString: () => ev(`tostring(${exp})`),
       _L: exp,
     }, {
       get(target, prop) {
@@ -111,24 +111,24 @@ QtObject {
   // - 不能返回不为方法的function，所有function视为方法
   // - 其他情况下，如果返回值不能被cbor编码，则会为null
   function evaluate(exp) {
-    const luaType = _eval(`type(${exp})`);
+    const luaType = ev(`type(${exp})`);
     if (luaType === "userdata" || luaType === "thread") {
       return null;
     }
     if (luaType === "function") {
       return fn(exp);
     }
-    if (luaType !== "table") return _eval(exp);
+    if (luaType !== "table") return ev(exp);
 
-    const isClass = _eval(`not not ${exp}.class`);
-    const isClassArr = _eval(`not not (${exp}[1] and ${exp}[1].class)`);
-    if (!isClass && !isClassArr) return _eval(exp);
+    const isClass = ev(`not not ${exp}.class`);
+    const isClassArr = ev(`not not (${exp}[1] and ${exp}[1].class)`);
+    if (!isClass && !isClassArr) return ev(exp);
     
     if (isClass) {
       return createProxy(exp);
     }
     if (isClassArr) {
-      return _eval(exp).map(createProxyFromCbor);
+      return ev(exp).map(createProxyFromCbor);
     }
   }
 }

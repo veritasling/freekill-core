@@ -48,8 +48,6 @@ QtObject {
     Void = 8
   }
 
-  // 奇技淫巧系列
-
   function getPlayer(id) {
     return Lua.evaluate(`ClientInstance:getPlayerById(${id})`);
   }

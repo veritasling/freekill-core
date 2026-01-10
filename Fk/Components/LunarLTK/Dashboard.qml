@@ -130,18 +130,17 @@ RowLayout {
 
     skillPanel.clearSkills();
 
-    for (const s of Lua.selfPlayer.player_skills) {
+    const self = Lua.selfPlayer;
+    for (const s of self.player_skills) {
       addSkill(s.name);
     }
 
-    cards = roomScene.drawPile.remove(Lua.selfPlayer.getCardIds("h"), null,
-    Lua.fn(`function()
-      local ret = {}
-      for _, cid in ipairs(Self:getCardIds("h")) do
-        ret[tostring(cid)] = Self:cardVisible(cid)
-      end
-      return ret
-    end`)());
+    const cids = self.getCardIds("h");
+    const visibleData = {};
+    for (const cid of cids) {
+      visibleData[cid.toString()] = self.cardVisible(cid);
+    }
+    cards = roomScene.drawPile.remove(cids, null, visibleData);
     handcardAreaItem.add(cards);
   }
 

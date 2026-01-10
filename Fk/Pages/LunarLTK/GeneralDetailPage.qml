@@ -194,19 +194,15 @@ Item {
 
   function getSameNameGenerals(general) {
     if (general === undefined) return [];
-    let generals = Lua.evaluate(`(function(general)
-      local trueName = (Fk.generals[general] or {}).trueName
-      local generals = {}
-      if trueName then
-        for i, g in pairs(Fk.generals) do
-          if g.trueName == trueName and i ~= general then
-            table.insert(generals, i)
-          end
-        end
-      end
-      return generals
-    end)("${general}")`)
-    return generals
+    const g = Ltk.getGeneral(general);
+    if (!g) return [];
+    // 不用Lua.fk.same_generals是为了避免拷贝，这玩意挺大
+    const sameGenerals = Lua.ev(`Fk.same_generals['${g.trueName}']`);
+    if (sameGenerals) {
+      sameGenerals.splice(sameGenerals.indexOf(general), 1);
+      return sameGenerals;
+    }
+    return []
   }
 
   Component {

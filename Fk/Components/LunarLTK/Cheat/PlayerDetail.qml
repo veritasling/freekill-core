@@ -330,15 +330,11 @@ Flickable {
       } else {
         if (realKnown.length > 0) {
           skillDesc.append("已知手牌：" +
-            realKnown.map(id => {
-              return Lua.evaluate(`Fk:getCardById(${id}):toLogString(false)`);
-            }).join(","));
+            realKnown.map(id => Ltk.getCard(id).toLogString(false)).join(","));
         }
         if (uncertain.length > 0) {
           skillDesc.append("不确定手中是否拥有的手牌：" +
-            uncertain.map(id => {
-              return Lua.evaluate(`Fk:getCardById(${id}):toLogString(false)`);
-            }).join(","));
+            uncertain.map(id => Ltk.getCard(id).toLogString(false)).join(","));
         }
       }
     }

@@ -112,8 +112,8 @@ W.PageBase {
     Button {
       text: Lua.tr("Copy as ban scheme")
       onClicked: {
-        const disabledGenerals = Lua.evaluate("ClientInstance.disabled_generals");
-        const disabledPack = Lua.evaluate("ClientInstance.disabled_packs");
+        const disabledGenerals = Lua.client.disabled_generals;
+        const disabledPack = Lua.client.disabled_packs;
         const allPack = Ltk.getAllGeneralPack();
         const scheme = {
           name: (new Date).toJSON(),
@@ -235,18 +235,16 @@ W.PageBase {
     }
   }
 
-
-
   Component.onCompleted: {
-    const disabledGenerals = Lua.evaluate("ClientInstance.disabled_generals");
-    const disabledPack = Lua.evaluate("ClientInstance.disabled_packs");
+    const disabledGenerals = Lua.client.disabled_generals;
+    const disabledPack = Lua.client.disabled_packs;
     const allPack = Ltk.getAllGeneralPack();
     pkgModel.clear();
     const allGenerals = [];
     for (let pkname of allPack) {
       if (disabledPack.includes(pkname)) continue;
       let generals = Ltk.getGenerals(pkname);
-      generals = generals.filter(g => !Lua.evaluate(`Fk.generals['${g}'].hidden`));
+      generals = generals.filter(g => !Ltk.getGeneral(g).hidden);
       generals = generals.filter(g => !disabledGenerals.includes(g));
       if (generals.length === 0) continue;
       pkgModel.append({

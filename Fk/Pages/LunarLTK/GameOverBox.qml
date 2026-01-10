@@ -148,7 +148,7 @@ GraphicsBox {
   }
 
   function getSummary() {
-    const summaryData = Lua.evaluate("ClientInstance.banners['GameSummary']");
+    const summaryData = Lua.client.getBanner('GameSummary');
     if (!summaryData || summaryData.length === 0) {
       return;
     }
@@ -202,6 +202,6 @@ GraphicsBox {
   }
 
   Component.onCompleted: {
-    my_role = Lua.evaluate("Self.role");
+    my_role = Lua.selfPlayer.role;
   }
 }

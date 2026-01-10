@@ -6,6 +6,7 @@ import QtQuick.Layouts
 
 import Fk.Widgets as W
 import Fk
+import Fk.Components.LunarLTK
 
 Rectangle {
   color: "transparent"
@@ -17,7 +18,7 @@ Rectangle {
     if (general == "__server") {
       general = "";
       avatar = "__server"
-    } else if (Lua.evaluate(`ClientInstance:getPlayerById(${data.sender}) == nil`)) {
+    } else if (!Ltk.getPlayer(data.sender)) {
       avatar = "__observer";
     }
     chatLogBox.append({
@@ -84,13 +85,15 @@ Rectangle {
 
   function loadSkills() {
     skills.clear();
-    const general = Lua.evaluate(`Self.general`);
+
+    const self = Lua.selfPlayer;
+    const general = self.general;
     if (general) {
       loadGeneralSkillAudios(general);
       findWinDeathAudio(general, true);
       findWinDeathAudio(general, false);
     }
-    const deputyGeneral = Lua.evaluate(`Self.deputyGeneral`);
+    const deputyGeneral = self.deputyGeneral;
     if (deputyGeneral) {
       loadGeneralSkillAudios(deputyGeneral);
       findWinDeathAudio(deputyGeneral, true);
@@ -232,7 +235,7 @@ Rectangle {
 
         onClicked: {
           opTimer.start();
-          const general = Lua.evaluate(`Self.general`);
+          const general = Lua.selfPlayer.general;
           if ( name === "fastchat_m" ) {
             if (general !== "") {
               const data = Lua.call("GetGeneralDetail", general);

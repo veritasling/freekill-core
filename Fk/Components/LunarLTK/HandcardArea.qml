@@ -114,10 +114,9 @@ Item {
       cardSelected(card.cid, true);
     }
 
-    const pids = Lua.evaluate('table.map(ClientInstance.players, Util.IdMapper)');
     let belowPhoto;
-    for (const pid of pids) {
-      const photo = roomScene.getPhoto(pid);
+    for (const player of Lua.client.players) {
+      const photo = roomScene.getPhoto(player.id);
       const actualW = photo.width * photo.scale;
       const actualH = photo.height * photo.scale;
       const actualX = photo.x + (photo.width - actualW) / 2;

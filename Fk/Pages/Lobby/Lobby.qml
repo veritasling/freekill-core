@@ -521,10 +521,10 @@ W.PageBase {
   }
 
   Component.onCompleted: {
-    Lua.client = Lua.evaluate("ClientInstance");
-    Lua.selfPlayer = Lua.evaluate("Self");
-    Lua.fk = Lua.evaluate("Fk");
-    console.log(Lua.client, Lua.selfPlayer, Lua.fk)
+    Lua.client = Lua.createProxy("ClientInstance");
+    Lua.selfPlayer = Lua.createProxy("Self");
+    Lua.fk = Lua.createProxy("Fk");
+
     addCallback(Command.UpdateRoomList, updateRoomList);
     addCallback(Command.UpdatePlayerNum, updatePlayerNum);
 
