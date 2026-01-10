@@ -40,7 +40,7 @@ GraphicsBox {
 
   property int lines: processMatrixRowLengthCompact(all_names)
 
-  title.text: Util.processPrompt(prompt)
+  title.text: Ltk.processPrompt(prompt)
   width: 700
   height: lines * 45 + 20 + 40
 

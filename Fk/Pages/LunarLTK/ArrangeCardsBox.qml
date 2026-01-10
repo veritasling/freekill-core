@@ -25,7 +25,7 @@ GraphicsBox {
   property int size: 0
   property int padding: 25
 
-  title.text: Backend.translate(prompt !== "" ? Util.processPrompt(prompt) : "Please arrange cards")
+  title.text: Backend.translate(prompt !== "" ? Ltk.processPrompt(prompt) : "Please arrange cards")
   width: body.width + padding * 2
   height: title.height + body.height + padding * 2
 

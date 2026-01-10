@@ -14,7 +14,7 @@ MetroButton {
   property string answer: default_choice
   property bool detailed: false
 
-  text: Util.processPrompt(answer)
+  text: Ltk.processPrompt(answer)
 
   onAnswerChanged: {
     if (!answer) return;

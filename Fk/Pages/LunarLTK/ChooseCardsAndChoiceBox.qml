@@ -22,7 +22,7 @@ GraphicsBox {
   property var cancel_options: []
   property var extra_data
 
-  title.text: prompt !== "" ? Util.processPrompt(prompt) : Lua.tr("$ChooseCard")
+  title.text: prompt !== "" ? Ltk.processPrompt(prompt) : Lua.tr("$ChooseCard")
   // TODO: Adjust the UI design in case there are more than 7 cards
   width: 40 + Math.min(8.5, Math.max(4, cards.length)) * 100
   height: 260
@@ -116,7 +116,7 @@ GraphicsBox {
 
         MetroButton {
           Layout.fillWidth: true
-          text: Util.processPrompt(modelData)
+          text: Ltk.processPrompt(modelData)
           enabled: {
             const cards = root.selected_ids;
             if (!(cards && cards.length >= root.min && cards.length <= root.max)) return false;
@@ -148,7 +148,7 @@ GraphicsBox {
 
         MetroButton {
           Layout.fillWidth: true
-          text: Util.processPrompt(modelData)
+          text: Ltk.processPrompt(modelData)
           enabled: true
 
           onClicked: {

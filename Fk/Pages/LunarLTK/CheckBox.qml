@@ -5,6 +5,7 @@ import QtQuick.Layouts
 
 import Fk
 import Fk.Components.Common
+import Fk.Components.LunarLTK
 
 GraphicsBox {
   property var options: []
@@ -34,7 +35,7 @@ GraphicsBox {
 
       MetroToggleButton {
         Layout.fillWidth: true
-        text: Util.processPrompt(modelData)
+        text: Ltk.processPrompt(modelData)
         enabled: options.indexOf(modelData) !== -1
                  && (root.result.length < max_num || triggered)
 

@@ -14,7 +14,7 @@ MetroButton {
   property string default_choice : (extra_data !== undefined) ? extra_data.default_choice : ""
   property string answer: default_choice
 
-  text: Util.processPrompt(answer)
+  text: Ltk.processPrompt(answer)
 
   onAnswerChanged: {
     if (!answer) return;

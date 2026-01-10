@@ -59,7 +59,7 @@ QtObject {
     const dataList = Ltk.getTargetTip(playerid);
     // 翻译是个逻辑，这里要负责直接向ui呈送需要的文本
     for (const data of dataList) {
-      data.content = Util.processPrompt(data.content);
+      data.content = Ltk.processPrompt(data.content);
     }
     targetTip = dataList;
   }

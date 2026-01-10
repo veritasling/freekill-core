@@ -300,6 +300,6 @@ GraphicsBox {
   }
 
   function refreshPrompt() {
-    prompt = Util.processPrompt(Ltk.chooseGeneralPrompt(rule_type, generals, extra_data))
+    prompt = Ltk.processPrompt(Ltk.chooseGeneralPrompt(rule_type, generals, extra_data))
   }
 }

@@ -10,7 +10,7 @@ import Fk.Components.LunarLTK
 GraphicsBox {
   id: root
 
-  title.text: Util.processPrompt(Ltk.poxiPrompt(poxi_type, card_data, extra_data))
+  title.text: Ltk.processPrompt(Ltk.poxiPrompt(poxi_type, card_data, extra_data))
 
   // TODO: Adjust the UI design in case there are more than 7 cards
   width: 70 + 700
@@ -190,7 +190,7 @@ GraphicsBox {
   }
 
   function refreshPrompt() {
-    root.title.text = Util.processPrompt(Ltk.poxiPrompt(poxi_type, card_data, extra_data))
+    root.title.text = Ltk.processPrompt(Ltk.poxiPrompt(poxi_type, card_data, extra_data))
   }
 
   function findCardItem(cid) {

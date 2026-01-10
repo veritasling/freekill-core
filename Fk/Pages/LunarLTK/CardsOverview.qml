@@ -232,7 +232,7 @@ W.PageBase {
       if (cards) {
         cardText.append("<br/>" + Lua.tr("Every suit & number:"));
         cardText.append(cards.map(c => {
-          return (suitTable[c.suit] + Util.convertNumber(c.number))
+          return (suitTable[c.suit] + Ltk.convertNumber(c.number))
         }).join(", "));
       }
     }

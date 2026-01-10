@@ -15,7 +15,7 @@ GraphicsBox {
                 (root.multiChoose ?
                    Lua.tr("$ChooseCards").arg(root.min).arg(root.max)
                    : Lua.tr("$ChooseCard"))
-                : Util.processPrompt(prompt)
+                : Ltk.processPrompt(prompt)
 
   // TODO: Adjust the UI design in case there are more than 7 cards
   width: 70 + 700

@@ -55,7 +55,7 @@ Item {
   GlowText {
     id: numberItem
     visible: !sealed && number > 0 && number < 14
-    text: Util.convertNumber(number)
+    text: Ltk.convertNumber(number)
     color: "white"
     font.family: Config.libianName
     font.pixelSize: 12
