@@ -49,16 +49,22 @@ QtObject {
 
   // 求值一个Lua中的exp
   // - 若为基本类型，直接返回相关值
-  // - 若为函数或userdata或协程，则无法求出，返回null
+  // - 若为userdata或协程，则无法求出，返回null
+  // - 若为function，用Lua.fn包裹
   // - 若为表：
   //   - 若为能被JSON编码的简单表，基于JSON返回对应的Js值
   //   - 其他情况返回Proxy
   //
-  // Proxy可以像Lua对象那样读取属性、调用方法，但如果返回值不能被cbor编码，则会为null
+  // Proxy可以像Lua对象那样读取属性、调用方法，但有这些限制：
+  // - 不能返回不为方法的function，所有function视为方法
+  // - 其他情况下，如果返回值不能被cbor编码，则会为null
   function evaluate(exp) {
     const luaType = _eval(`type(${exp})`);
-    if (luaType === "function" || luaType === "userdata" || luaType === "thread") {
+    if (luaType === "userdata" || luaType === "thread") {
       return null;
+    }
+    if (luaType === "function") {
+      return fn(exp);
     }
     if (luaType !== "table") return _eval(exp);
 
