@@ -47,7 +47,16 @@ QtObject {
   property var targetTip: []  // “可烈弓”之类的目标提示文本，已翻译好
   property list<var> limitSkills: []  // 限定技区域，var的内容为 { skill, time }
 
-  // 此人的标记，详见RoomModel中的注释
+  // 此人的所有标记，不分图和无图，毕竟这里是数据model环节
+  // var的结构为如此的object：
+  // - name: 标记名（已翻译）
+  // - value: 标记应该显示出的值（比如某些标记的长度，或how_to_show）
+  // - origName: 未翻译的标记名
+  // - origValue: 未处理过的原value
+  // - desc: @!!图片标专用（已力竭）
+  // - qmlPath: 若为qml mark则为要加载的qml文件
+  // - qmlData: 同前
+  // - cheatSource: 应付pile和武将牌列表的玩意，一下子想不出好办法
   property list<var> marks: []
   property list<var> picMarks: [] // Photo特有，内容与marks一致
 

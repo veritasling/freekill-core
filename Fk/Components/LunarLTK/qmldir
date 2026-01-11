@@ -3,6 +3,7 @@ module Fk.Components.LunarLTK
 singleton Ltk 1.0 LtkLuaUtil.qml
 RoomModel 1.0 RoomModel.qml
 PhotoModel 1.0 PhotoModel.qml
+DashboardModel 1.0 PhotoModel.qml
 
 CardArea 1.0 CardArea.qml
 CardItem 1.0 CardItem.qml

@@ -59,7 +59,6 @@ export const SetCardVirtName = "SetCardVirtName";
 export const ShowVirtualCard = "ShowVirtualCard";
 export const DestroyTableCard = "DestroyTableCard";
 export const DestroyTableCardByEvent = "DestroyTableCardByEvent";
-export const MaxCard = "MaxCard";
 export const AddPlayer = "AddPlayer";
 export const RemovePlayer = "RemovePlayer";
 export const RoomOwner = "RoomOwner";

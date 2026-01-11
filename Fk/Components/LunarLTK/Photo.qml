@@ -135,12 +135,8 @@ PhotoBase {
 
     function updatePileInfo(areaName) {
       if (areaName.startsWith('#')) return;
-      // const data = root.dataModel.luaPlayer.getPile(areaName);
-      // if (data.length === 0) {
-      //   root.markArea.removeMark(areaName);
-      // } else {
-      //   root.markArea.setMark(areaName, data.length.toString());
-      // }
+      const data = root.dataModel.luaPlayer.getPile(areaName);
+      Ltk.setMark(root.dataModel.marks, areaName, data.length, root.dataModel.playerid);
     }
 
     function add(inputs, areaName) {

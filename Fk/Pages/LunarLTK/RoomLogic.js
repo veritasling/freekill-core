@@ -595,28 +595,6 @@ callbacks["UpdateSkill"] = (sender, j) => {
   }
 }
 
-callbacks["ArrangeSeats"] = (sender, order) => {
-  // jsonData: seat order
-
-  for (let i = 0; i < photoModel.length; i++) {
-    const item = photoModel[i];
-    item.seatNumber = order.indexOf(item.playerid) + 1;
-  }
-
-  // make Self to the first of list, then reorder photomodel
-  const selfIndex = order.indexOf(Self.id);
-  const after = order.splice(selfIndex);
-  after.push(...order);
-  const photoOrder = after;
-
-  for (let i = 0; i < photoModel.length; i++) {
-    const item = photoModel[i];
-    item.index = photoOrder.indexOf(item.playerid);
-  }
-
-  arrangePhotos();
-}
-
 function cancelAllFocus() {
   let item;
   const playerNum = roomScene.dataModel.playerNum;
@@ -1298,7 +1276,7 @@ callbacks["ChangeSelf"] = (sender, j) => {
       dashboard.self = photos.itemAt(i);
     }
   }
-  callbacks["ArrangeSeats"](null, order);
+  dataModel.arrangeSeats(null, order);
 
   // update dashboard
   dashboard.update();

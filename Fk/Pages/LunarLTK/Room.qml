@@ -41,6 +41,7 @@ W.PageBase {
     id: dataModel
     roomPage: roomScene
 
+    onSeatChanged: Logic.arrangePhotos();
     onPlayerAdded: model => roomScene.photoModel.push(model);
   }
 
@@ -74,6 +75,7 @@ W.PageBase {
           okButton.enabled = false;
           cancelButton.enabled = false;
           endPhaseButton.visible = false;
+          dataModel.promptText = "";
           progress.visible = false;
           extra_data = {};
 
@@ -835,11 +837,9 @@ W.PageBase {
     addCallback(Command.ShowVirtualCard, Logic.callbacks["ShowVirtualCard"]);
     addCallback(Command.DestroyTableCard, Logic.callbacks["DestroyTableCard"]);
     addCallback(Command.DestroyTableCardByEvent, Logic.callbacks["DestroyTableCardByEvent"]);
-    addCallback(Command.MaxCard, Logic.callbacks["MaxCard"]);
     addCallback(Command.UpdateHandcard, Logic.callbacks["UpdateHandcard"]);
     addCallback(Command.UpdateCard, Logic.callbacks["UpdateCard"]);
     addCallback(Command.UpdateSkill, Logic.callbacks["UpdateSkill"]);
-    addCallback(Command.ArrangeSeats, Logic.callbacks["ArrangeSeats"]);
     addCallback(Command.MoveFocus, Logic.callbacks["MoveFocus"]);
     addCallback(Command.PlayerRunned, Logic.callbacks["PlayerRunned"]);
     addCallback(Command.AskForGeneral, Logic.callbacks["AskForGeneral"]);

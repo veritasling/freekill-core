@@ -276,6 +276,7 @@ QtObject {
     return Lua.call("ToUIString", v);
   }
 
+  // 以下为QML常用函数
   function convertNumber(number) {
     if (number === 1)
     return "A";
@@ -327,5 +328,93 @@ QtObject {
       raw = raw.replace(new RegExp("%arg", "g"), Lua.tr(data[3]));
     }
     return raw;
+  }
+
+  function setMark(marks, mark, rawValue, playerid) {
+    const elem = marks.find(e => e.origName === mark);
+    if (rawValue === 0) {
+      if (elem) marks.splice(marks.indexOf(elem), 1);
+      return;
+    }
+
+    let value = rawValue;
+    if (mark.startsWith("@@")) {
+      value = "";
+    } else if (rawValue instanceof ArrayBuffer) {
+      // cbor的情况
+      value = Ltk.toUIString(rawValue);
+    } else if (!(rawValue instanceof Object)) {
+      value = rawValue.toString();
+    }
+
+    let textValue = "";
+    let qmlPath, cheatSource;
+    let qmlData = { name: mark };
+
+    if (!mark.startsWith("@")) {
+      // Lua不会把不可见mark传来的，所以这部分肯定是玩家pile
+      const pile = Ltk.getPlayer(playerid).getPile(mark).filter(e => Lua.selfPlayer.cardVisible(e));
+      if (pile.length === 0) return;
+
+      textValue = pile.length.toString();
+      cheatSource = "ViewPile";
+      qmlData.ids = pile;
+    } else if (mark.startsWith("@$")) {
+      // 游戏牌名列表 但也可能是游戏牌id列表呢
+      textValue = value.length.toString();
+      cheatSource = "ViewPile";
+      if (typeof value[0] === "number") {
+        qmlData.ids = value;
+      } else {
+        qmlData.cardNames = value;
+      }
+    } else if (mark.startsWith("@&")) {
+      // 武将牌名列表
+      textValue = value.length.toString();
+      cheatSource = "ViewGeneralPile";
+      qmlData.cardNames = value;
+    } else if (mark.startsWith("@[")) {
+      const close_br = mark.indexOf(']');
+      if (close_br !== -1) {
+        const mark_type = mark.slice(2, close_br);
+        const data = Ltk.getQmlMark(mark_type, mark, playerid);
+        if (data) {
+          qmlPath = data.qml_path;
+          qmlData.data = data.qml_data;
+          qmlData.owner = playerid;
+          textValue = data.text;
+        }
+      }
+    } else {
+      textValue = value instanceof Array
+           ? value.map((markText) => Lua.tr(markText)).join(' ')
+           : Lua.tr(value);
+    }
+
+    // @!! 追加翻译标记名和描述
+    let desc;
+    if (mark.startsWith('@!!')) {
+      desc = `<b>${Lua.tr(mark)}</b><br>` +
+        `${Lua.tr(":" + mark)}${textValue && "<br>" + textValue}`;
+    }
+
+
+    if (elem) {
+      elem.value = textValue;
+      elem.origValue = value;
+      elem.qmlPath = qmlPath;
+      elem.qmlData = qmlData;
+      elem.cheatSource = cheatSource;
+      elem.desc = desc;
+    } else {
+      marks.push({
+        name: Lua.tr(mark),
+        value: textValue,
+        origName: mark,
+        origValue: value,
+        qmlPath, qmlData, cheatSource,
+        desc,
+      });
+    }
   }
 }
