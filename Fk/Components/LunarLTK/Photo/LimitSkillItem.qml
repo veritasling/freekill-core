@@ -26,12 +26,12 @@ Item {
     font.family: Config.li2Name
     style: Text.Outline
     styleColor: "#3D2D1C"
-    text: Lua.tr(skillname);
+    text: Lua.tr(root.skillname);
   }
 
   Text {
     id: x
-    opacity: (skilltype === "limit" || skilltype === "quest") ? 1 : 0
+    opacity: (root.skilltype === "limit" || root.skilltype === "quest") ? 1 : 0
     text: "X"
     font.family: Config.libianName
     font.pixelSize: 28

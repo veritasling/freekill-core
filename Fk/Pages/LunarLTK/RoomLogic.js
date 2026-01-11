@@ -282,7 +282,7 @@ function sortHandcards(sortMethods) {
     handcards.sort((prev, next) => {
       if (prev.footnote === next.footnote) {
         if (prev.number === next.number) {
-          if (suitInteger[prev.suit] === suitInteger[next.suit]) {
+          if (prev.suit === next.suit) {
             return prev.cid - next.cid;
           } else {
             return suitInteger[prev.suit] - suitInteger[next.suit];
@@ -313,7 +313,7 @@ function sortHandcards(sortMethods) {
     handcards = hands.slice(0);
     handcards.sort((prev, next) => {
       if (prev.footnote === next.footnote) {
-        if (suitInteger[prev.suit] === suitInteger[next.suit]) {
+        if (prev.suit === next.suit) {
           if (prev.number === next.number) {
             return prev.cid - next.cid;
           } else {
@@ -1290,17 +1290,6 @@ callbacks["UpdateMiniGame"] = (sender, data) => {
 
 callbacks["EmptyRequest"] = (sender, data) => {
   roomScene.activate();
-}
-
-callbacks["UpdateLimitSkill"] = (sender, data) => {
-  const id = data[0];
-  const skill = data[1];
-  const time = data[2];
-
-  const photo = getPhoto(id);
-  if (photo) {
-    photo.updateLimitSkill(skill, time);
-  }
 }
 
 callbacks["UpdateDrawPile"] = (sender, j) => {

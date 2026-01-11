@@ -29,7 +29,7 @@ QtObject {
 
   property list<PhotoModel> players // 所有玩家的photo所需数据（包括自己的）
 
-  signal playerAdded() // 新玩家加入的信号（addNpc）
+  signal playerAdded(PhotoModel model) // 新玩家加入的信号（addNpc）
 
   function getTimeString(time) {
     let s = time % 60;
@@ -73,6 +73,11 @@ QtObject {
     }
   }
 
+  function updateLimitSkill(sender, data) {
+    const [ id, skill, time ] = data;
+    getPhoto(id)?.updateLimitSkill(skill, time);
+  }
+
   function addNpc(_, data) {
     const [id, name, avatar] = data;
     const photoModelComponent = Qt.createComponent("Fk.Components.LunarLTK", "PhotoModel");
@@ -85,13 +90,14 @@ QtObject {
     model.index = players.length;
     players.push(model);
     playerNum++;
-    playerAdded();
+    playerAdded(model);
   }
 
   // 确定只会修改model属性的逻辑都搬家到这里
   function setupCallbacks() {
     roomPage.addCallback(Command.PropertyUpdate, propertyUpdate);
     roomPage.addCallback(Command.StartGame, startGame);
+    roomPage.addCallback(Command.UpdateLimitSkill, updateLimitSkill);
     roomPage.addCallback("AddNpc", addNpc);
   }
 

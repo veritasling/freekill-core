@@ -3,39 +3,20 @@
 import QtQuick
 import QtQuick.Layouts
 
-import Fk
+import Fk.Components.LunarLTK
 
 ColumnLayout {
   id: root
 
+  required property PhotoModel dataModel
+
   Repeater {
     id: rep
-    model: ListModel {
-      id: skills
-    }
+    model: root.dataModel.limitSkills
     LimitSkillItem {
-      skillname: skillname_
-      usedtimes: times
+      required property var modelData
+      skillname: modelData.skill
+      usedtimes: modelData.time
     }
   }
-
-  function update(skill, times) {
-    for (let i = 0; i < rep.count; i++) {
-      const data = skills.get(i);
-      if (data.skillname_ === skill) {
-        data.times = times;
-        if (times == -1) {
-          skills.remove(i);
-        }
-        return;
-      }
-    }
-    if (times > -1) {
-      skills.append({
-        skillname_: skill,
-        times: times,
-      });
-    }
-  }
-
 }

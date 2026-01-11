@@ -41,11 +41,7 @@ W.PageBase {
     id: dataModel
     roomPage: roomScene
 
-    // addNpc用
-    onPlayerAdded: {
-      const newPlayerModel = players[players.length - 1];
-      roomScene.photoModel.push(newPlayerModel);
-    }
+    onPlayerAdded: model => roomScene.photoModel.push(model);
   }
 
   MediaPlayer {
@@ -885,7 +881,6 @@ W.PageBase {
     addCallback(Command.MiniGame, Logic.callbacks["MiniGame"]);
     addCallback(Command.UpdateMiniGame, Logic.callbacks["UpdateMiniGame"]);
     addCallback(Command.EmptyRequest, Logic.callbacks["EmptyRequest"]);
-    addCallback(Command.UpdateLimitSkill, Logic.callbacks["UpdateLimitSkill"]);
     addCallback(Command.UpdateDrawPile, Logic.callbacks["UpdateDrawPile"]);
     addCallback(Command.UpdateRoundNum, Logic.callbacks["UpdateRoundNum"]);
     addCallback(Command.ChangeSelf, Logic.callbacks["ChangeSelf"]);

@@ -44,6 +44,7 @@ QtObject {
 
   // 其他UI元素
   property var targetTip: []
+  property list<var> limitSkills: []
 
   function updateHandcards() {
     handcards = luaPlayer.getCardIds("h");
@@ -62,5 +63,17 @@ QtObject {
       data.content = Ltk.processPrompt(data.content);
     }
     targetTip = dataList;
+  }
+
+  function updateLimitSkill(skill, time) {
+    const elem = limitSkills.find(e => e.skill === skill);
+    if (elem) {
+      elem.time = time;
+      if (time === -1) {
+        limitSkills.splice(limitSkills.indexOf(elem), 1);
+      }
+    } else if (time > -1) {
+      limitSkills.push({ skill, time, });
+    }
   }
 }

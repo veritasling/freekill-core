@@ -2,13 +2,11 @@
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
 
 import Fk
 import Fk.Components.Common
 import Fk.Components.LunarLTK
 import Fk.Components.LunarLTK.Photo
-import Fk.Widgets as W
 
 PhotoBase {
   id: root
@@ -84,45 +82,11 @@ PhotoBase {
     Behavior on opacity { NumberAnimation { duration: 300 } }
   }
 
-  ColumnLayout {
-    id: restRect
-    anchors.centerIn: photoMask
+  RestIndicator {
+    anchors.centerIn: root.photoMask
     anchors.leftMargin: 15
-    visible: root.dataModel.rest > 0
 
-    GlowText {
-      Layout.alignment: Qt.AlignCenter
-      text: Lua.tr("resting...")
-      font.family: Config.libianName
-      font.pixelSize: 30
-      font.bold: true
-      color: "#FEF7D6"
-      glow.color: "#845422"
-      glow.spread: 0.8
-    }
-
-    GlowText {
-      Layout.alignment: Qt.AlignCenter
-      visible: root.dataModel.rest > 0 && root.dataModel.rest < 999
-      text: root.dataModel.rest
-      font.family: Config.libianName
-      font.pixelSize: 25
-      font.bold: true
-      color: "#DBCC69"
-      glow.color: "#2E200F"
-      glow.spread: 0.6
-    }
-
-    GlowText {
-      Layout.alignment: Qt.AlignCenter
-      visible: root.dataModel.rest > 0 && root.dataModel.rest < 999
-      text: Lua.tr("rest round num")
-      font.family: Config.libianName
-      font.pixelSize: 21
-      color: "#F0E5D6"
-      glow.color: "#2E200F"
-      glow.spread: 0.6
-    }
+    dataModel: root.dataModel
   }
 
   Image {
@@ -167,7 +131,6 @@ PhotoBase {
 
     InvisibleCardArea {
       id: specialContainer
-      // checkExisting: true
     }
 
     function updatePileInfo(areaName) {
@@ -222,15 +185,15 @@ PhotoBase {
       }
       return SkinBank.deathDir + "saveme";
     }
-    anchors.centerIn: photoMask
+    anchors.centerIn: root.photoMask
     scale: 0.75
   }
 
   Image {
     id: netstat
     source: SkinBank.stateDir + root.dataModel.netstate
-    x: photoMask.x
-    y: photoMask.y
+    x: root.photoMask.x
+    y: root.photoMask.y
     scale: 0.9 * 0.75
     transformOrigin: Item.TopLeft
   }
@@ -256,7 +219,7 @@ PhotoBase {
         }
       }
       font.family: Config.libianName
-      font.pixelSize: text.includes("/") ? 24 : 20
+      font.pixelSize: text.includes("/") ? 20 : 24
       //font.weight: 30
       color: "white"
       anchors.horizontalCenter: parent.horizontalCenter
@@ -280,15 +243,16 @@ PhotoBase {
   }
 
   LimitSkillArea {
-    id: limitSkills
     anchors.top: parent.top
     anchors.right: parent.right
     anchors.topMargin: role.height + 2
     anchors.rightMargin: 22
+
+    dataModel: root.dataModel
   }
 
   Image {
-    visible: root.state === "candidate" && !selectable && !selected
+    visible: root.state === "candidate" && !root.selectable && !root.selected
     source: SkinBank.photoDir + "disable"
     x: 23; y: -16
     scale: 0.75
@@ -381,58 +345,10 @@ PhotoBase {
     }
   }
 
-  RowLayout {
+  TargetTip {
     anchors.centerIn: parent
-    spacing: 5
 
-    Repeater {
-      model: root.dataModel.targetTip
-
-      Item {
-        required property var modelData
-        // Layout.alignment: Qt.AlignHCenter
-        width: modelData.type === "normal" ? 30 : 18
-
-        GlowText {
-          anchors.centerIn: parent
-          visible: parent.modelData.type === "normal"
-          text: parent.modelData.content
-          font.family: Config.li2Name
-          color: "#FEFE84"
-          font.pixelSize: {
-            if (text.length <= 3) return 27;
-            else return 21;
-          }
-          //font.bold: true
-          glow.color: "black"
-          glow.spread: 0.3
-          glow.radius: 4
-          lineHeight: 0.85
-          horizontalAlignment: Text.AlignHCenter
-          wrapMode: Text.WrapAnywhere
-          width: font.pixelSize + 4
-        }
-
-        Text {
-          anchors.centerIn: parent
-          visible: parent.modelData.type === "warning"
-          font.family: Config.libianName
-          font.pixelSize: 18
-          opacity: 0.9
-          horizontalAlignment: Text.AlignHCenter
-          lineHeight: 18
-          lineHeightMode: Text.FixedHeight
-          //color: "#EAC28A"
-          color: "snow"
-          width: 18
-          wrapMode: Text.WrapAnywhere
-          style: Text.Outline
-          //styleColor: "#83231F"
-          styleColor: "red"
-          text: parent.modelData.content
-        }
-      }
-    }
+    dataModel: root.dataModel
   }
 
   InvisibleCardArea {
@@ -457,11 +373,6 @@ PhotoBase {
     anchors.topMargin: -4
   }
 
-  InvisibleCardArea {
-    id: defaultArea
-    anchors.centerIn: parent
-  }
-
   Rectangle {
     color: "white"
     height: 15
@@ -480,10 +391,6 @@ PhotoBase {
     transformOrigin: Item.BottomRight
 
     dataModel: root.dataModel
-  }
-
-  function updateLimitSkill(skill, time) {
-    limitSkills.update(skill, time);
   }
 
   function handleMarkAreaUpdate(data) {
