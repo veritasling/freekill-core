@@ -57,8 +57,24 @@ QtObject {
     }
   }
 
+  function propertyUpdate(sender, data) {
+    const [uid, property_name, value] = data;
+    const model = getPhoto(uid);
+    if (model && property_name in model) {
+      model[property_name] = value;
+    }
+  }
+
+  function startGame(sender, jsonData) {
+    for (const model of players) {
+      model.general = "";
+    }
+  }
+
+  // 确定只会修改model属性的逻辑都搬家到这里
   function setupCallbacks() {
-    // TODO 等那场 ~大搬家~
+    roomPage.addCallback(Command.PropertyUpdate, propertyUpdate);
+    roomPage.addCallback(Command.StartGame, startGame);
   }
 
   function initialize() {

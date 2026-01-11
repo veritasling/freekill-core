@@ -829,6 +829,8 @@ W.PageBase {
   }
 
   function setupCallbacks() {
+    dataModel.setupCallbacks();
+
     addCallback(Command.NetStateChanged, netStateChanged);
     // TODO 摆烂了 反正这些后面也是得重构 懒得搬砖了
     addCallback(Command.SetCardFootnote, Logic.callbacks["SetCardFootnote"]);
@@ -837,11 +839,9 @@ W.PageBase {
     addCallback(Command.DestroyTableCard, Logic.callbacks["DestroyTableCard"]);
     addCallback(Command.DestroyTableCardByEvent, Logic.callbacks["DestroyTableCardByEvent"]);
     addCallback(Command.MaxCard, Logic.callbacks["MaxCard"]);
-    addCallback(Command.PropertyUpdate, Logic.callbacks["PropertyUpdate"]);
     addCallback(Command.UpdateHandcard, Logic.callbacks["UpdateHandcard"]);
     addCallback(Command.UpdateCard, Logic.callbacks["UpdateCard"]);
     addCallback(Command.UpdateSkill, Logic.callbacks["UpdateSkill"]);
-    addCallback(Command.StartGame, Logic.callbacks["StartGame"]);
     addCallback(Command.ArrangeSeats, Logic.callbacks["ArrangeSeats"]);
     addCallback(Command.MoveFocus, Logic.callbacks["MoveFocus"]);
     addCallback(Command.PlayerRunned, Logic.callbacks["PlayerRunned"]);

@@ -540,36 +540,6 @@ function doIndicate(from, tos) {
   line.running = true;
 }
 
-function getPlayerStr(playerid) {
-  const photo = getPhoto(playerid);
-  if (photo.general === "anjiang" && (photo.deputyGeneral === "anjiang" || !photo.deputyGeneral)) {
-    let ret = Lua.tr("seat#" + photo.seatNumber);
-    if (playerid == Self.id) {
-      ret = ret + Lua.tr("playerstr_self")
-    }
-    return Lua.tr(ret);
-  }
-
-  let ret = photo.general;
-  ret = Lua.tr(ret);
-  if (photo.deputyGeneral && photo.deputyGeneral !== "") {
-    ret = ret + "/" + Lua.tr(photo.deputyGeneral);
-  }
-  if (playerid == Self.id) {
-    ret = ret + Lua.tr("playerstr_self")
-  }
-  return ret;
-}
-
-callbacks["PropertyUpdate"] = (sender, data) => {
-  // jsonData: int id, string property_name, value
-  const [uid, property_name, value] = data;
-  let model = dataModel.getPhoto(uid);
-  if (model && property_name in model) {
-    model[property_name] = value;
-  }
-}
-
 callbacks["UpdateHandcard"] = (sender) => {
   roomScene.dashboard.handcardArea.cards.forEach((v) => {
     const id = v.cid;
@@ -622,16 +592,6 @@ callbacks["UpdateSkill"] = (sender, j) => {
       item.locked = !skill.isEffectable(p);
       item.times = skill.getTimes(p);
     }
-  }
-}
-
-callbacks["StartGame"] = (sender, jsonData) => {
-  roomScene.isStarted = true;
-
-  for (let i = 0; i < photoModel.length; i++) {
-    const item = photoModel[i];
-    item.ready = false;
-    item.general = "";
   }
 }
 
@@ -1072,7 +1032,7 @@ callbacks["CancelRequest"] = () => {
 
 callbacks["AskForUseCard"] = (sender, data) => {
   // jsonData: card, pattern, prompt, cancelable, {}
-  const [ cardname, pattern, prompt, _, extra_data, disabledSkillNames ] = data;
+  const [ cardname, pattern, prompt, cancelable, extra_data, disabledSkillNames ] = data;
 
   roomScene.dataModel.setPrompt(prompt || `#AskForUseCard:::${cardname}`);
   roomScene.activate();
@@ -1092,7 +1052,7 @@ callbacks["AskForUseCard"] = (sender, data) => {
 
 callbacks["AskForResponseCard"] = (sender, data) => {
   // jsonData: card_name, pattern, prompt, cancelable, {}
-  const [ cardname, pattern, prompt, _, _, disabledSkillNames ] = data;
+  const [ cardname, pattern, prompt, cancelable, extra_data, disabledSkillNames ] = data;
 
   roomScene.dataModel.setPrompt(prompt || `#AskForResponseCard:::${cardname}`);
   roomScene.activate();
