@@ -138,12 +138,8 @@ function getPhoto(id) {
 }
 
 function getAreaItem(area, id) {
-  if (area === Ltk.Card.DrawPile) {
-    return drawPile;
-  } else if (area === Ltk.Card.DiscardPile || area === Ltk.Card.Processing ||
-             area === Ltk.Card.Void) {
-    return tablePile;
-  }
+  const publicArea = roomScene.getAreaItem(area);
+  if (publicArea) return publicArea;
 
   const photo = getPhoto(id);
   if (!photo) {
@@ -355,21 +351,6 @@ function sortHandcards(sortMethods) {
   others.forEach(c => {
     output.push(c);
   });
-  /*
-  console.log("----------------------");
-  dashboard.handcardArea.cards.forEach(c => {
-    console.log("handcards: " + c.cid);
-  });
-  console.log("----------------------");
-  others.forEach(c => {
-    console.log("others: " + c.cid);
-  });
-  console.log("----------------------");
-  output.forEach(c => {
-    console.log("output: " + c.cid);
-  });
-  console.log("----------------------");
-  */
   dashboard.handcardArea.cards = output;
   dashboard.handcardArea.updateCardPosition(true);
 }
@@ -580,26 +561,6 @@ function getPlayerStr(playerid) {
   return ret;
 }
 
-function processPrompt(prompt) {
-  const data = prompt.split(":");
-  let raw = Lua.tr(data[0]);
-  const src = parseInt(data[1]);
-  const dest = parseInt(data[2]);
-  if (raw.match("%src"))
-    raw = raw.replace(/%src/g, getPlayerStr(src));
-  if (raw.match("%dest"))
-    raw = raw.replace(/%dest/g, getPlayerStr(dest));
-
-  if (data.length > 3) {
-    for (let i = data.length - 1; i > 3; i--) {
-      raw = raw.replace(new RegExp("%arg" + (i - 2), "g"), Lua.tr(data[i]));
-    }
-
-    raw = raw.replace(new RegExp("%arg", "g"), Lua.tr(data[3]));
-  }
-  return raw;
-}
-
 callbacks["PropertyUpdate"] = (sender, data) => {
   // jsonData: int id, string property_name, value
   const [uid, property_name, value] = data;
@@ -709,8 +670,7 @@ function cancelAllFocus() {
 callbacks["MoveFocus"] = (sender, data) => {
   // jsonData: int[] focuses, string command
   cancelAllFocus();
-  const focuses = data[0];
-  const command = data[1];
+  const [ focuses, command ] = data;
   const timeout = data[2] ?? (Config.roomTimeout * 1000);
 
   let item, model;
@@ -727,8 +687,7 @@ callbacks["MoveFocus"] = (sender, data) => {
 
 callbacks["PlayerRunned"] = (sender, data) => {
   // jsonData: int runner, int robot
-  const runner = data[0];
-  const robot = data[1];
+  const [ runner, robot ] = data;
 
   const model = dataModel.getPhoto(runner);
   if (typeof(model) !== "undefined") {
@@ -738,15 +697,9 @@ callbacks["PlayerRunned"] = (sender, data) => {
 
 callbacks["AskForGeneral"] = (sender, data) => {
   // jsonData: string[] generals, integer n, boolean no_convert, boolean heg, string rule, table extra_data
-  //const {generals, n, no_convert, heg, rule, extra_data } = data;
-  const generals = data[0];
-  const n = data[1];
-  const no_convert = data[2];
-  const heg = data[3];
-  const rule = data[4];
-  const extra_data = data[5];
+  const [ generals, n, no_convert, heg, rule, extra_data ] = data;
 
-  roomScene.setPrompt(Lua.tr("#AskForGeneral"), true);
+  roomScene.dataModel.setPrompt("#AskForGeneral");
   roomScene.activate();
   roomScene.popupBox.sourceComponent =
     Qt.createComponent("Fk.Pages.LunarLTK", "ChooseGeneralBox");
@@ -768,14 +721,8 @@ callbacks["AskForGeneral"] = (sender, data) => {
 
 callbacks["AskForSkillInvoke"] = (sender, data) => {
   // jsonData: [ string name, string prompt ]
-  const skill = data[0];
-  const prompt = data[1];
-  roomScene.promptText = prompt ? processPrompt(prompt)
-                              : Lua.tr("#AskForSkillInvoke").arg(Lua.tr(skill));
-  // roomScene.activate();
-  // roomScene.okCancel.visible = true;
-  // roomScene.okButton.enabled = true;
-  // roomScene.cancelButton.enabled = true;
+  const [ skill, prompt ] = data;
+  roomScene.dataModel.setPrompt(prompt || `#AskForSkillInvoke:::${skill}`);
   roomScene.activate();
 }
 
@@ -875,17 +822,9 @@ callbacks["AskForExchange"] = (sender, data) => {
 callbacks["AskForChoice"] = (sender, data) => {
   // jsonData: [ string[] choices, string skill ]
   // TODO: multiple choices, e.g. benxi_ol
-  const choices = data[0];
-  const all_choices = data[1];
-  const skill_name = data[2];
-  const prompt = data[3];
-  const detailed = data[4];
-  if (prompt === "") {
-    roomScene.promptText = Lua.tr("#AskForChoice")
-      .arg(Lua.tr(skill_name));
-  } else {
-    roomScene.setPrompt(processPrompt(prompt), true);
-  }
+  const [ choices, all_choices, skill_name, prompt, detailed ] = data;
+
+  roomScene.dataModel.setPrompt(prompt || `#AskForChoice:::${skill_name}`);
   roomScene.activate();
   let qmlSrc;
   if (!detailed) {
@@ -906,20 +845,8 @@ callbacks["AskForChoice"] = (sender, data) => {
 callbacks["AskForChoices"] = (sender, data) => {
   // jsonData: [ string[] choices, string skill ]
   // TODO: multiple choices, e.g. benxi_ol
-  const choices = data[0];
-  const all_choices = data[1];
-  const min_num = data[2][0];
-  const max_num = data[2][1];
-  const cancelable = data[3];
-  const skill_name = data[4];
-  const prompt = data[5];
-  const detailed = data[6];
-  if (prompt === "") {
-    roomScene.promptText = Lua.tr("#AskForChoices")
-      .arg(Lua.tr(skill_name));
-  } else {
-    roomScene.setPrompt(processPrompt(prompt), true);
-  }
+  const [ choices, all_choices, [ min_num, max_num], cancelable, skill_name, prompt, detailed ] = data;
+  roomScene.dataModel.setPrompt(prompt || `#AskForChoice:::${skill_name}`);
   roomScene.activate();
   let qmlSrc;
   if (!detailed) {
@@ -949,12 +876,7 @@ callbacks["AskForCardChosen"] = (sender, data) => {
   //  string reason ]
   const reason = data._reason;
   const prompt = data._prompt;
-  if (prompt === "") {
-    roomScene.promptText = Lua.tr(processPrompt("#AskForChooseCard:" + data._id))
-      .arg(Lua.tr(reason));
-  } else {
-    roomScene.setPrompt(processPrompt(prompt), true);
-  }
+  roomScene.dataModel.setPrompt(prompt || `#AskForChooseCard:${data._id}::${reason}`);
   roomScene.activate();
   roomScene.popupBox.sourceComponent =
     Qt.createComponent("Fk.Pages.LunarLTK", "PlayerCardBox");
@@ -988,13 +910,8 @@ callbacks["AskForCardsChosen"] = (sender, data) => {
   const max = data._max;
   const reason = data._reason;
   const prompt = data._prompt;
-  if (prompt === "") {
-    roomScene.promptText = Lua.tr(processPrompt("#AskForChooseCards:" + data._id))
-    .arg(Lua.tr(reason)).arg(min).arg(max);
-  } else {
-    roomScene.setPrompt(processPrompt(prompt), true);
-  }
 
+  roomScene.dataModel.setPrompt(prompt || `#AskForChooseCards:${data._id}::${reason}:${min}:${max}`);
   roomScene.activate();
   roomScene.popupBox.sourceComponent =
     Qt.createComponent("Fk.Pages.LunarLTK", "PlayerCardBox");
@@ -1120,9 +1037,7 @@ callbacks["PlayCard"] = () => {
 
 callbacks["LoseSkill"] = (sender, data) => {
   // jsonData: [ int player_id, string skill_name ]
-  const id = data[0];
-  const skill_name = data[1];
-  const prelight = data[2];
+  const [ id, skill_name, prelight ] = data;
   if (id === Self.id) {
     dashboard.loseSkill(skill_name, prelight);
   }
@@ -1130,34 +1045,23 @@ callbacks["LoseSkill"] = (sender, data) => {
 
 callbacks["AddSkill"] = (sender, data) => {
   // jsonData: [ int player_id, string skill_name ]
-  const id = data[0];
-  const skill_name = data[1];
-  const prelight = data[2];
+  const [ id, skill_name, prelight ] = data;
   if (id === Self.id) {
     dashboard.addSkill(skill_name, prelight);
   }
 }
 
 callbacks["PrelightSkill"] = (sender, data) => {
-  const skill_name = data[0];
-  const prelight = data[1];
+  const [ skill_name, prelight ] = data;
 
   dashboard.prelightSkill(skill_name, prelight);
 }
 
 callbacks["AskForUseActiveSkill"] = (sender, data) => {
   // jsonData: string skill_name, string prompt
-  const skill_name = data[0];
-  const prompt = data[1];
-  const cancelable = data[2];
+  const [ skill_name, prompt, cancelable ] = data;
   const extra_data = data[3] ?? {};
-  if (prompt === "") {
-    roomScene.promptText = Lua.tr("#AskForUseActiveSkill")
-      .arg(Lua.tr(skill_name));
-  } else {
-    roomScene.setPrompt(processPrompt(prompt), true);
-  }
-
+  roomScene.dataModel.setPrompt(prompt || `#AskForUseActiveSkill:::${skill_name}`);
   roomScene.activate();
   roomScene.okCancel.visible = true;
 }
@@ -1168,18 +1072,9 @@ callbacks["CancelRequest"] = () => {
 
 callbacks["AskForUseCard"] = (sender, data) => {
   // jsonData: card, pattern, prompt, cancelable, {}
-  const cardname = data[0];
-  const pattern = data[1];
-  const prompt = data[2];
-  const extra_data = data[4];
-  const disabledSkillNames = data[5];
+  const [ cardname, pattern, prompt, _, extra_data, disabledSkillNames ] = data;
 
-  if (prompt === "") {
-    roomScene.promptText = Lua.tr("#AskForUseCard")
-      .arg(Lua.tr(cardname));
-  } else {
-    roomScene.setPrompt(processPrompt(prompt), true);
-  }
+  roomScene.dataModel.setPrompt(prompt || `#AskForUseCard:::${cardname}`);
   roomScene.activate();
   roomScene.okCancel.visible = true;
   if (extra_data != null) {
@@ -1193,26 +1088,13 @@ callbacks["AskForUseCard"] = (sender, data) => {
       roomScene.extra_data = extra_data;
     }
   }
-  // roomScene.responding_card = pattern;
-  // disabledSkillNames && (dashboard.disabledSkillNames = disabledSkillNames);
-  // roomScene.state = "responding";
-  // okButton.enabled = false;
-  // cancelButton.enabled = true;
 }
 
 callbacks["AskForResponseCard"] = (sender, data) => {
   // jsonData: card_name, pattern, prompt, cancelable, {}
-  const cardname = data[0];
-  const pattern = data[1];
-  const prompt = data[2];
-  const disabledSkillNames = data[5];
+  const [ cardname, pattern, prompt, _, _, disabledSkillNames ] = data;
 
-  if (prompt === "") {
-    roomScene.promptText = Lua.tr("#AskForResponseCard")
-      .arg(Lua.tr(cardname));
-  } else {
-    roomScene.setPrompt(processPrompt(prompt), true);
-  }
+  roomScene.dataModel.setPrompt(prompt || `#AskForResponseCard:::${cardname}`);
   roomScene.activate();
   roomScene.okCancel.visible = true;
 }
@@ -1509,7 +1391,7 @@ callbacks["ChangeSelf"] = (sender, j) => {
 
 callbacks["UpdateRequestUI"] = (sender, uiUpdate) => {
   if (uiUpdate["_prompt"])
-    roomScene.promptText = processPrompt(uiUpdate["_prompt"]);
+    roomScene.dataModel.setPrompt(uiUpdate["_prompt"]);
 
   if (uiUpdate._type == "Room") {
     roomScene.applyChange(uiUpdate);

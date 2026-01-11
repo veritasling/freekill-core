@@ -18,8 +18,6 @@ W.PageBase {
   property alias popupBox: popupBox
   property alias manualBox: manualBox
   property alias bigAnim: bigAnim
-  property alias promptText: prompt.text
-  property var currentPrompt
   property alias okCancel: okCancel
   property alias okButton: okButton
   property alias cancelButton: cancelButton
@@ -33,9 +31,8 @@ W.PageBase {
   // 权宜之计 后面全改
   property alias cheatDrawer: cheatLoader
 
-  property var selected_targets: []
-  property string responding_card
-  property var extra_data: ({})
+  // 本轮跳过无懈专用
+  property var extra_data: ({}) // 史
   property var skippedUseEventId: []
 
   property alias dataModel: dataModel
@@ -71,7 +68,6 @@ W.PageBase {
       ScriptAction {
         script: {
           skillInteraction.sourceComponent = undefined;
-          promptText = "";
           okCancel.visible = false;
           okButton.enabled = false;
           cancelButton.enabled = false;
@@ -82,7 +78,6 @@ W.PageBase {
           dashboard.disableAllCards();
           dashboard.disableSkills();
           dashboard.pending_skill = "";
-          // dashboard.retractAllPiles();
 
           for (const model of photoModel) {
             const item = model.photoItem;
@@ -352,6 +347,7 @@ W.PageBase {
       visible: progress.visible
       anchors.bottom: progress.bottom
       z: 1
+      text: roomScene.dataModel.promptText
       color: "#F0E5DA"
       font.pixelSize: 16
       font.family: Config.libianName
@@ -687,15 +683,6 @@ W.PageBase {
     cheatLoader.close();
   }
 
-  function setPrompt(text, iscur) {
-    promptText = text;
-    if (iscur) currentPrompt = text;
-  }
-
-  function resetPrompt() {
-    promptText = currentPrompt;
-  }
-
   function getPhoto(id) {
     return Logic.getPhoto(id);
   }
@@ -830,6 +817,15 @@ W.PageBase {
     const photo = Logic.getPhoto(id);
     if (!photo) return;
     photo.handleMarkAreaUpdate(change);
+  }
+
+  function getAreaItem(area) {
+    if (area === Ltk.Card.DrawPile) {
+      return drawPile;
+    } else if (area === Ltk.Card.DiscardPile || area === Ltk.Card.Processing ||
+             area === Ltk.Card.Void) {
+      return tablePile;
+    }
   }
 
   function setupCallbacks() {

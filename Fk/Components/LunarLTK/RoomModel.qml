@@ -19,7 +19,6 @@ QtObject {
   property var roomPage
 
   property string promptText    // 要显示的prompt文本（已翻译）
-  property var promptStack      // prompt文本栈，因为有各种转化技的存在需要弹出压入啥的
 
   property int playerNum        // 房间当前游玩人数
   property int dashboardId      // 初次开局时主视角id 用于保存主视角本来的玩家防止被切视角乱掉
@@ -44,6 +43,10 @@ QtObject {
         return model;
       }
     }
+  }
+
+  function setPrompt(text) {
+    promptText = Ltk.processPrompt(text);
   }
 
   // 一秒5刷智慧
