@@ -43,8 +43,13 @@ QtObject {
   property list<int> handcards
 
   // 其他UI元素
-  property var targetTip: []
-  property list<var> limitSkills: []
+
+  property var targetTip: []  // “可烈弓”之类的目标提示文本，已翻译好
+  property list<var> limitSkills: []  // 限定技区域，var的内容为 { skill, time }
+
+  // 此人的标记，详见RoomModel中的注释
+  property list<var> marks: []
+  property list<var> picMarks: [] // Photo特有，内容与marks一致
 
   function updateHandcards() {
     handcards = luaPlayer.getCardIds("h");
@@ -73,7 +78,7 @@ QtObject {
         limitSkills.splice(limitSkills.indexOf(elem), 1);
       }
     } else if (time > -1) {
-      limitSkills.push({ skill, time, });
+      limitSkills.push({ skill, time });
     }
   }
 }

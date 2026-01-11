@@ -135,12 +135,12 @@ PhotoBase {
 
     function updatePileInfo(areaName) {
       if (areaName.startsWith('#')) return;
-      const data = root.dataModel.luaPlayer.getPile(areaName);
-      if (data.length === 0) {
-        root.markArea.removeMark(areaName);
-      } else {
-        root.markArea.setMark(areaName, data.length.toString());
-      }
+      // const data = root.dataModel.luaPlayer.getPile(areaName);
+      // if (data.length === 0) {
+      //   root.markArea.removeMark(areaName);
+      // } else {
+      //   root.markArea.setMark(areaName, data.length.toString());
+      // }
     }
 
     function add(inputs, areaName) {
@@ -163,6 +163,8 @@ PhotoBase {
 
     anchors.bottom: equipAreaItem.top
     x: 23
+
+    markModel: root.dataModel.marks
   }
 
   Image {
@@ -371,6 +373,8 @@ PhotoBase {
     anchors.top: parent.bottom
     anchors.right: parent.right
     anchors.topMargin: -4
+
+    dataModel: root.dataModel
   }
 
   Rectangle {

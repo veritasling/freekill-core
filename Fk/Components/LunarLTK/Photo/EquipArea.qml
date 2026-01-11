@@ -38,7 +38,7 @@ Item {
       anchors.centerIn: parent
       // checkExisting: true
       onLengthChanged: {
-        root.length = root.dataModel.luaPlayer.getCardIds("e");
+        root.length = root.dataModel.luaPlayer.getCardIds("e").length;
       }
     }
 

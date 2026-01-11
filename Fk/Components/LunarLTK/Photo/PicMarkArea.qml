@@ -4,32 +4,33 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import Fk
+import Fk.Components.LunarLTK
 
 RowLayout {
   id: root
   spacing: 4
 
-  ListModel {
-    id: markList
-  }
+  required property PhotoModel dataModel
 
   Repeater {
     id: markRepeater
-    model: markList
+    model: root.dataModel.picMarks
 
     Item {
+      id: markItem
+      required property var modelData
       width: 21
       height: 21
       Image {
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
-        source: SkinBank.getMarkPic(mark_name)
+        source: SkinBank.getMarkPic(parent.modelData.origName)
 
         MouseArea{ // 鼠标经过时显示文字，单击固定
           id: markArea
           anchors.fill: parent
           hoverEnabled: true
-          enabled: mark_extra !== ""
+          enabled: markItem.modelData.desc !== ""
           onEntered: {
             descriptionTip.visible = true;
           }
@@ -45,7 +46,7 @@ RowLayout {
           id: descriptionTip
           x: 20
           y: 20
-          text: mark_extra
+          text: markItem.modelData.desc;
           visible: false
           property bool clicked: false
           font.family: Config.libianName
@@ -56,53 +57,13 @@ RowLayout {
       Text { // 右下角的文字，单个为翻译，1省略，数组为数量
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        text: special_value
-        visible: special_value !== ""
+        text: markItem.modelData.value
+        visible: markItem.modelData.value && markItem.modelData.value !== "1"
         font.family: Config.libianName
         font.pixelSize: 20
         font.bold: true
         color: "white"
         style: Text.Outline
-      }
-    }
-  }
-
-  function setMark(mark, data) {
-    let i, modelItem;
-    for (i = 0; i < markList.count; i++) {
-      if (markList.get(i).mark_name === mark) {
-        modelItem = markList.get(i);
-        break;
-      }
-    }
-    let special_value = '';
-
-    if (data instanceof Array) {
-      special_value += data.length;
-      data = data.map((markText) => Lua.tr(markText)).join('<br>');
-    } else {
-      data = data === '1' ? '' : Lua.tr(data);
-      special_value += data;
-    }
-
-    if (mark.startsWith('@!!')) { // @!! 追加翻译标记名和描述
-      data = '<b>' + Lua.tr(mark) + '</b>' + '<br>' + Lua.tr(":" + mark) + (data === '' ? '' : '<br>' + data);
-    }
-
-    if (modelItem) { // 如果已经存在
-      modelItem.special_value = special_value;
-      modelItem.mark_extra = data;
-    } else {
-      markList.append({ mark_name: mark, mark_extra: data, special_value }); // special_value 传数量， mark_extra 传内容（翻译后的）
-    }
-  }
-
-  function removeMark(mark) {
-    let i, modelItem;
-    for (i = 0; i < markList.count; i++) {
-      if (markList.get(i).mark_name === mark) {
-        markList.remove(i, 1);
-        return;
       }
     }
   }

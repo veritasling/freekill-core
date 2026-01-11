@@ -15,8 +15,8 @@ ColumnLayout {
     model: root.dataModel.limitSkills
     LimitSkillItem {
       required property var modelData
-      skillname: modelData.skill
-      usedtimes: modelData.time
+      skillname: modelData?.skill
+      usedtimes: modelData?.time
     }
   }
 }

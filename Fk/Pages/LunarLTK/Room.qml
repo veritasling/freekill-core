@@ -615,6 +615,8 @@ W.PageBase {
     width: ((roomScene.width - 175 * 0.75 * 7) / 4 + 175 - 16) * 0.75
     transformOrigin: Item.TopLeft
     bgColor: "#BB838AEA"
+
+    markModel: roomScene.dataModel.marks
   }
 
   Shortcut {
@@ -861,8 +863,6 @@ W.PageBase {
     addCallback(Command.CancelRequest, Logic.callbacks["CancelRequest"]);
     addCallback(Command.AskForUseCard, Logic.callbacks["AskForUseCard"]);
     addCallback(Command.AskForResponseCard, Logic.callbacks["AskForResponseCard"]);
-    addCallback(Command.SetPlayerMark, Logic.callbacks["SetPlayerMark"]);
-    addCallback(Command.SetBanner, Logic.callbacks["SetBanner"]);
     addCallback(Command.Animate, Logic.callbacks["Animate"]);
     addCallback(Command.LogEvent, Logic.callbacks["LogEvent"]);
     addCallback(Command.GameOver, Logic.callbacks["GameOver"]);

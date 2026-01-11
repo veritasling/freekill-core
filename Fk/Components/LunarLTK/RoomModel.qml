@@ -29,6 +29,21 @@ QtObject {
 
   property list<PhotoModel> players // 所有玩家的photo所需数据（包括自己的）
 
+  // 此人的所有标记，不分图和无图，毕竟这里是数据model环节
+  // var的结构为如此的object：
+  // - name: 标记名（已翻译）
+  // - value: 标记应该显示出的值（比如某些标记的长度，或how_to_show）
+  // - origName: 未翻译的标记名
+  // - origValue: 未处理过的原value
+  // - desc: @!!图片标专用（已力竭）
+  // - qmlPath: 若为qml mark则为要加载的qml文件
+  // - qmlData: 同前
+  // - cheatSource: 应付pile和武将牌列表的玩意，一下子想不出好办法
+  // 顺便某个角色的pile牌在Photo的显示方面也算作mark；pile在1秒5刷环节更新
+  //
+  // 当然这是在RoomModel底下，因为banner和mark的逻辑完完全全一样干脆沿用
+  property list<var> marks: []
+
   signal playerAdded(PhotoModel model) // 新玩家加入的信号（addNpc）
 
   function getTimeString(time) {
@@ -73,6 +88,103 @@ QtObject {
     }
   }
 
+  // 因为Banner也是同一逻辑所以放在这
+  function setMark(marks, mark, rawValue, playerid) {
+    const elem = marks.find(e => e.origName === mark);
+    if (rawValue === 0) {
+      if (elem) marks.splice(marks.indexOf(elem), 1);
+      return;
+    }
+
+    let value = rawValue;
+    if (mark.startsWith("@@")) {
+      value = "";
+    } else if (rawValue instanceof ArrayBuffer) {
+      // cbor的情况
+      value = Ltk.toUIString(rawValue);
+    } else if (!(rawValue instanceof Object)) {
+      value = rawValue.toString();
+    }
+
+    let textValue = "";
+    let qmlPath, cheatSource;
+    let qmlData = { name: mark };
+
+    if (!mark.startsWith("@")) {
+      // Lua不会把不可见mark传来的，所以这部分肯定是玩家pile
+      const pile = Ltk.getPlayer(playerid).getPile(mark).filter((e) => Lua.selfPlayer.cardVisible(e));
+      if (pile.length === 0) return;
+
+      textValue = pile.length.toString();
+      cheatSource = "ViewPile";
+      qmlData.ids = pile;
+    } else if (mark.startsWith("@$")) {
+      // 游戏牌名列表 但也可能是游戏牌id列表呢
+      textValue = value.length.toString();
+      cheatSource = "ViewPile";
+      if (typeof value[0] === "number") {
+        qmlData.ids = value;
+      } else {
+        qmlData.cardNames = value;
+      }
+    } else if (mark.startsWith("@&")) {
+      // 武将牌名列表
+      textValue = value.length.toString();
+      cheatSource = "ViewGeneralPile";
+      qmlData.cardNames = value;
+    } else if (mark.startsWith("@[")) {
+      const close_br = mark.indexOf(']');
+      if (close_br !== -1) {
+        const mark_type = mark.slice(2, close_br);
+        const data = Ltk.getQmlMark(mark_type, mark, playerid);
+        if (data) {
+          qmlPath = data.qml_path;
+          qmlData.data = data.qml_data;
+          qmlData.owner = playerid;
+          textValue = data.text;
+        }
+      }
+    } else {
+      textValue = value instanceof Array
+           ? value.map((markText) => Lua.tr(markText)).join(' ')
+           : Lua.tr(value);
+    }
+
+    // @!! 追加翻译标记名和描述
+    let desc;
+    if (mark.startsWith('@!!')) {
+      desc = `<b>${Lua.tr(mark)}</b><br>` +
+        `${Lua.tr(":" + mark)}${textValue && "<br>" + textValue}`;
+    }
+
+
+    if (elem) {
+      elem.value = textValue;
+      elem.origValue = value;
+      elem.desc = desc;
+    } else {
+      marks.push({
+        name: Lua.tr(mark),
+        value: textValue,
+        origName: mark,
+        origValue: value,
+        qmlPath, qmlData, cheatSource,
+        desc,
+      });
+    }
+  }
+
+  function setPlayerMark(_, data) {
+    const [ id, mark, v ] = data;
+    const player = getPhoto(id);
+    setMark(mark.startsWith("@!") ? player.picMarks : player.marks, mark, v, id);
+  }
+
+  function setBanner(_, data) {
+    const [ mark, v ] = data;
+    setMark(marks, mark, v);
+  }
+
   function updateLimitSkill(sender, data) {
     const [ id, skill, time ] = data;
     getPhoto(id)?.updateLimitSkill(skill, time);
@@ -97,6 +209,8 @@ QtObject {
   function setupCallbacks() {
     roomPage.addCallback(Command.PropertyUpdate, propertyUpdate);
     roomPage.addCallback(Command.StartGame, startGame);
+    roomPage.addCallback(Command.SetPlayerMark, setPlayerMark);
+    roomPage.addCallback(Command.SetBanner, setBanner);
     roomPage.addCallback(Command.UpdateLimitSkill, updateLimitSkill);
     roomPage.addCallback("AddNpc", addNpc);
   }

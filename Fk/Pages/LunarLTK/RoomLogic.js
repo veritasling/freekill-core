@@ -1059,40 +1059,6 @@ callbacks["AskForResponseCard"] = (sender, data) => {
   roomScene.okCancel.visible = true;
 }
 
-const getMarkValue = function(value) {
-  if (value instanceof ArrayBuffer) {
-    return Lua.call("ToUIString", value);
-  } else if (!(value instanceof Object)) {
-    return value.toString();
-  } else {
-    return value;
-  }
-}
-
-callbacks["SetPlayerMark"] = (sender, data) => {
-  const player = getPhoto(data[0]);
-  const mark = data[1];
-  const value = getMarkValue(data[2]);
-
-  let area = mark.startsWith("@!") ? player.picMarkArea : player.markArea;
-  if (data[2] === 0) {
-    area.removeMark(mark);
-  } else {
-    area.setMark(mark, mark.startsWith("@@") ? "" : value);
-  }
-}
-
-callbacks["SetBanner"] = (sender, data) => {
-  const mark = data[0];
-  const value = getMarkValue(data[1]);
-  let area = roomScene.banner;
-  if (data[1] === 0) {
-    area.removeMark(mark);
-  } else {
-    area.setMark(mark, mark.startsWith("@@") ? "" : value);
-  }
-}
-
 callbacks["Animate"] = (sender, data) => {
   // jsonData: [Object object]
   switch (data.type) {
