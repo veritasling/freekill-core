@@ -814,13 +814,6 @@ W.PageBase {
     model.netstate = state;
   }
 
-  function updateMarkArea(sender, data) {
-    const { id, change } = data;
-    const photo = Logic.getPhoto(id);
-    if (!photo) return;
-    photo.handleMarkAreaUpdate(change);
-  }
-
   function getAreaItem(area) {
     if (area === Ltk.Card.DrawPile) {
       return drawPile;
@@ -888,8 +881,6 @@ W.PageBase {
     addCallback(Command.GetPlayerHandcards, Logic.callbacks["GetPlayerHandcards"]);
     addCallback(Command.ReplyToServer, Logic.callbacks["ReplyToServer"]);
     addCallback(Command.ChangeSkin, Logic.callbacks["ChangeSkin"]);
-
-    addCallback(Command.UpdateMarkArea, updateMarkArea);
   }
 
   Component.onCompleted: {

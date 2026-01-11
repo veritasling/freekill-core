@@ -120,4 +120,3 @@ export const ReplayerDurationSet = "ReplayerDurationSet";
 export const ReplayerElapsedChange = "ReplayerElapsedChange";
 export const ReplayerSpeedChange = "ReplayerSpeedChange";
 export const ChangeSkin = "ChangeSkin";
-export const UpdateMarkArea = "UpdateMarkArea";
