@@ -1370,33 +1370,3 @@ callbacks["ReplyToServer"] = (sender, data) => {
   replyToServer(data);
 }
 
-callbacks["AddNpc"] = (_, data) => {
-  const [id, name, avatar, ready, time] = data;
-  const modelData = {
-    id,
-    index: 0,   // For animating seat swap
-    general: avatar,
-    avatar,
-    deputyGeneral: "",
-    screenName: name,
-    role: "unknown",
-    role_shown: false,
-    kingdom: "unknown",
-    netstate: "online",
-    maxHp: 0,
-    hp: 0,
-    shield: 0,
-    seatNumber: 1,
-    dead: false,
-    dying: false,
-    faceup: true,
-    chained: false,
-    drank: 0,
-    rest: 0,
-    surrendered: false,
-    sealedSlots: "[]",
-  };
-  photoModel.append(modelData);
-
-  roomScene.dataModel.playerNum = photoModel.length; //?
-}

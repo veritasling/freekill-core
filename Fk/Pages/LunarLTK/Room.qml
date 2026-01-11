@@ -40,6 +40,12 @@ W.PageBase {
   RoomModel {
     id: dataModel
     roomPage: roomScene
+
+    // addNpc用
+    onPlayerAdded: {
+      const newPlayerModel = players[players.length - 1];
+      roomScene.photoModel.push(newPlayerModel);
+    }
   }
 
   MediaPlayer {
@@ -804,7 +810,7 @@ W.PageBase {
     const id = data[0];
     let state = data[1];
 
-    const model = Logic.getPhotoModel(id);
+    const model = dataModel.getPhoto(id);
     if (!model) return;
     if (state === "run" && model.dead) {
       state = "leave";
@@ -888,9 +894,6 @@ W.PageBase {
     addCallback(Command.ReplyToServer, Logic.callbacks["ReplyToServer"]);
     addCallback(Command.ChangeSkin, Logic.callbacks["ChangeSkin"]);
 
-    // 偷懒
-    addCallback("AddNpc", Logic.callbacks["AddNpc"]);
-
     addCallback(Command.UpdateMarkArea, updateMarkArea);
   }
 
@@ -900,7 +903,6 @@ W.PageBase {
 
     bgm.play();
 
-    // TODO 需要考虑重连，一定要把Self.id放在第一个
     for (let i = 0; i < dataModel.playerNum; i++) {
       photoModel.push(dataModel.players[i]);
     }
