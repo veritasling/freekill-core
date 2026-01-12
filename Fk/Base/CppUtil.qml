@@ -9,6 +9,7 @@ QtObject {
   readonly property string path: typeof AppPath !== 'undefined' ? AppPath : '/';
   readonly property string locale: typeof SysLocale !== 'undefined' ? SysLocale : 'zh_CN';
   readonly property bool debug: typeof Debugging !== 'undefined' ? Debugging : true;
+  readonly property var self: typeof Self !== 'undefined' ? Self : {};
 
   function notifyServer(command, data) {
     ClientInstance.notifyServer(command, data);

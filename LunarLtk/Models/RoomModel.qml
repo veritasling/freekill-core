@@ -74,7 +74,7 @@ QtObject {
     }
 
     // 然后打散order，把Self放到第一个，这样才好调整model们的index以重排photo
-    const selfIndex = order.indexOf(Self.id);
+    const selfIndex = order.indexOf(Cpp.self.id);
     const after = order.splice(selfIndex);
     after.push(...order);
     const photoOrder = after;
@@ -143,7 +143,7 @@ QtObject {
   }
 
   function initialize() {
-    dashboardId = Self.id;
+    dashboardId = Cpp.self.id;
     const luaPlayers = Lua.client.players;
     playerNum = luaPlayers.length;
     const photoModelComponent = Qt.createComponent("LunarLtk.Models", "PhotoModel");

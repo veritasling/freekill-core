@@ -9,6 +9,8 @@ import Fk.Components.Common
 import LunarLtk
 import LunarLtk.Components
 
+pragma ComponentBehavior: Bound
+
 GraphicsBox {
   id: root
 

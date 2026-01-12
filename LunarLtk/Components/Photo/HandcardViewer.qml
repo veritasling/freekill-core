@@ -17,10 +17,10 @@ Rectangle {
   height: 112
 
   visible: {
-    if (root.dataModel.playerid === Self.id) return false;
+    if (root.dataModel.playerid === Cpp.self.id) return false;
     if (root.dataModel.handcards.length === 0) return false; // 优先绑定再判buddy，否则不会更新
     if (!Lua.selfPlayer.isBuddy(root.dataModel.luaPlayer) &&
-    !Ltk.hasVisibleCard(Self.id, root.dataModel.playerid)) return false;
+    !Ltk.hasVisibleCard(Cpp.self.id, root.dataModel.playerid)) return false;
     return true;
   }
 

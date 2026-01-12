@@ -104,7 +104,7 @@ Flickable {
           const blocked = !Config.blockedUsers.includes(name);
           return blocked ? Lua.tr("Block Chatter") : Lua.tr("Unblock Chatter");
         }
-        enabled: pid !== Self.id && pid > 0 // 旁观屏蔽不了正在被旁观的人
+        enabled: pid !== Cpp.self.id && pid > 0 // 旁观屏蔽不了正在被旁观的人
         onClicked: {
           const name = extra_data?.photo ? extra_data.photo.screenName : extra_data.screenName;
           const idx = Config.blockedUsers.indexOf(name);
@@ -121,7 +121,7 @@ Flickable {
       /*
       MetroButton {
         text: Lua.tr("Change Skin")
-        visible: pid === Self.id && !root.isObserving
+        visible: pid === Cpp.self.id && !root.isObserving
         enabled: !(extra_data?.photo.changeSkinTimer.running)
         onClicked: {
           const photo = extra_data?.photo
@@ -148,7 +148,7 @@ Flickable {
         text: Lua.tr("Kick From Room")
         visible: !roomScene.isStarted && roomScene.isOwner
         enabled: {
-          if (pid === Self.id) return false;
+          if (pid === Cpp.self.id) return false;
           if (pid < -1) {
             const { minComp, curComp } = Ltk.getCompNum();
             return curComp > minComp;
@@ -320,7 +320,7 @@ Flickable {
 
     // 幽默记牌器环节 FIXME：帮忙补补翻译表 FIXME: 帮忙补补区域 FIXME: 帮忙整个重做
     skillDesc.append("------------------------------------");
-    const knownHandcards = Lua.evaluate(`Self.card_tracker:getPlayerKnownCards(${id}, Player.Hand)`);
+    const knownHandcards = Lua.evaluate(`Cpp.self.card_tracker:getPlayerKnownCards(${id}, Player.Hand)`);
     if (!knownHandcards) {
       skillDesc.append("没有已知手牌");
     } else {

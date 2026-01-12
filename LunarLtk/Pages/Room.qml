@@ -582,7 +582,7 @@ W.PageBase {
 
   GlowText {
     anchors.centerIn: dashboard
-    visible: Logic.getPhoto(Self.id).rest > 0 && !Config.observing
+    visible: Logic.getPhoto(Cpp.self.id).rest > 0 && !Config.observing
     text: Lua.tr("Resting, don't leave!")
     color: "#DBCC69"
     font.family: Config.libianName
@@ -696,7 +696,7 @@ W.PageBase {
   }
 
   function getPhotoOrDashboard(id) {
-    if (id === Self.id) return dashboard;
+    if (id === Cpp.self.id) return dashboard;
     return getPhoto(id);
   }
 

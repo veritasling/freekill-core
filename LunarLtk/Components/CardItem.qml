@@ -8,6 +8,8 @@ import Fk.Components.GameCommon as Game
 
 import LunarLtk
 
+pragma ComponentBehavior: Bound
+
 /* Layout of card:
  *      +--------+
  * num -|5       |

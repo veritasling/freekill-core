@@ -9,6 +9,8 @@ import Fk
 import LunarLtk
 import LunarLtk.Components
 
+pragma ComponentBehavior: Bound
+
 Item {
   id: root
   anchors.fill: parent

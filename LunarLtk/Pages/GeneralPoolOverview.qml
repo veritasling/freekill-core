@@ -9,6 +9,8 @@ import Fk.Components.Common
 import Fk.Widgets as W
 import LunarLtk
 
+pragma ComponentBehavior: Bound
+
 W.PageBase {
   id: root
   objectName: "GeneralPoolOverview"

@@ -153,7 +153,7 @@ Item {
       COUNT(CASE result WHEN 2 THEN 1 END) AS lose,
       COUNT(CASE result WHEN 3 THEN 1 END) AS draw,
       COUNT() AS total
-      FROM myGameData WHERE pid = ${Self.id} AND server_addr = '${addr}' AND general = '${general}'
+      FROM myGameData WHERE pid = ${Cpp.self.id} AND server_addr = '${addr}' AND general = '${general}'
       GROUP BY mode;`
       const result = Cpp.sqlquery(query);
 
@@ -361,7 +361,7 @@ Item {
       text: Lua.tr("Set as Avatar")
       visible: root.canSetAvatar
       enabled: detailGeneralCard.name !== "" && !opTimer.running
-      && Self.avatar !== detailGeneralCard.name
+      && Cpp.self.avatar !== detailGeneralCard.name
       onClicked: {
         App.setBusy(true);
         opTimer.start();

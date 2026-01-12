@@ -146,7 +146,7 @@ function getAreaItem(area, id) {
     return null;
   }
 
-  if (area === Ltk.Card.PlayerHand && id === Self.id) {
+  if (area === Ltk.Card.PlayerHand && id === Cpp.self.id) {
     return dashboard.handcardArea;
   }
 
@@ -216,7 +216,7 @@ function sortHandcards(sortMethods) {
 
   const others = [];
   const hands = [];
-  const orignal_hands = Ltk.getPlayerHandcards(Self.id); // 不计入expand_pile
+  const orignal_hands = Ltk.getPlayerHandcards(Cpp.self.id); // 不计入expand_pile
 
   dashboard.handcardArea.cards.forEach(c => {
     if (orignal_hands.includes(c.cid)) {
@@ -465,7 +465,7 @@ callbacks["ShowVirtualCard"] = (sender, data) => {
   let from = drawPile;
   const photo = getPhoto(playerid);
   if (photo) {
-    from = (playerid === Self.id ? dashboard.handcardArea : photo.handcardArea);
+    from = (playerid === Cpp.self.id ? dashboard.handcardArea : photo.handcardArea);
   }
 
   const items = [];
@@ -543,7 +543,7 @@ function doIndicate(from, tos) {
 callbacks["UpdateHandcard"] = (sender) => {
   roomScene.dashboard.handcardArea.cards.forEach((v) => {
     const id = v.cid;
-    if (Lua.evaluate(`ClientInstance:getCardArea(${id}) == Card.PlayerHand and ClientInstance:getCardOwner(${id}) == Self`)) {
+    if (Lua.evaluate(`ClientInstance:getCardArea(${id}) == Card.PlayerHand and ClientInstance:getCardOwner(${id}) == Cpp.self`)) {
       v.setData(Ltk.getCardData(id, true));
       v.known = Lua.selfPlayer.cardVisible(id);
       v.draggable = true;
@@ -580,7 +580,7 @@ callbacks["UpdateCard"] = (sender, j) => {
 }
 
 callbacks["UpdateSkill"] = (sender, j) => {
-  const sortable = Ltk.canSortHandcards(Self.id);
+  const sortable = Ltk.canSortHandcards(Cpp.self.id);
   dashboard.sortable = sortable;
   dashboard.handcardArea.sortable = sortable;
   const all_skills = [roomScene.dashboard.skillButtons, roomScene.dashboard.notActiveButtons];
@@ -976,7 +976,7 @@ callbacks["PlayCard"] = () => {
 callbacks["LoseSkill"] = (sender, data) => {
   // jsonData: [ int player_id, string skill_name ]
   const [ id, skill_name, prelight ] = data;
-  if (id === Self.id) {
+  if (id === Cpp.self.id) {
     dashboard.loseSkill(skill_name, prelight);
   }
 }
@@ -984,7 +984,7 @@ callbacks["LoseSkill"] = (sender, data) => {
 callbacks["AddSkill"] = (sender, data) => {
   // jsonData: [ int player_id, string skill_name ]
   const [ id, skill_name, prelight ] = data;
-  if (id === Self.id) {
+  if (id === Cpp.self.id) {
     dashboard.addSkill(skill_name, prelight);
   }
 }
@@ -1016,9 +1016,9 @@ callbacks["AskForUseCard"] = (sender, data) => {
   roomScene.activate();
   roomScene.okCancel.visible = true;
   if (extra_data != null) {
-    if ((extra_data.effectTo !== Self.id && // 忽略本轮无懈可击，但目标是自己时不忽略
+    if ((extra_data.effectTo !== Cpp.self.id && // 忽略本轮无懈可击，但目标是自己时不忽略
         roomScene.skippedUseEventId.find(id => id === extra_data.useEventId)) ||
-        (Config.noSelfNullification && extra_data.effectFrom === Self.id &&
+        (Config.noSelfNullification && extra_data.effectFrom === Cpp.self.id &&
         !Ltk.getCardData(extra_data.effectCardId).multiple_targets)) { // 不对自己使用的单目标锦囊牌无懈
       Ltk.updateRequestUI("Button", "Cancel");
       return;
@@ -1218,7 +1218,7 @@ callbacks["CustomDialog"] = (sender, data) => {
 callbacks["MiniGame"] = (sender, data) => {
   const game = data.type;
   const dat = data.data;
-  const gdata = Ltk.getMiniGame(game, Self.id, JSON.stringify(dat));
+  const gdata = Ltk.getMiniGame(game, Cpp.self.id, JSON.stringify(dat));
   roomScene.activate();
   roomScene.popupBox.source = AppPath + "/" + gdata.qml_path + ".qml";
   if (dat) {
@@ -1251,13 +1251,13 @@ callbacks["ChangeSkin"] = (sender, data) => {
   const path = data[2];
   const deputypath = data[3];
   if (path) {
-    if (Number(data[0]) === Self.id) {
+    if (Number(data[0]) === Cpp.self.id) {
       Config.enabledSkins[photo.general] = path === "-" ? "" : path;
     }
     photo.skinSource = path === "-" ? "" : (AppPath + "/" + path);
   }
   if (deputypath) {
-    if (Number(data[0]) === Self.id) {
+    if (Number(data[0]) === Cpp.self.id) {
       Config.enabledSkins[photo.deputyGeneral] = deputypath === "-" ? "" : deputypath;
     }
     photo.deputySkinSource = deputypath === "-" ? "" : (AppPath + "/" + deputypath);
@@ -1272,7 +1272,7 @@ callbacks["ChangeSelf"] = (sender, j) => {
   for (let i = 0; i < photoModel.length; i++) {
     const item = photoModel[i];
     order[item.seatNumber - 1] = item.playerid;
-    if (item.playerid === Self.id) {
+    if (item.playerid === Cpp.self.id) {
       dashboard.self = photos.itemAt(i);
     }
   }

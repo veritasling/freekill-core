@@ -304,7 +304,7 @@ QtObject {
         ret = ret + "/" + Lua.tr(deputy);
       }
     }
-    if (playerid == Self.id) {
+    if (playerid == Cpp.self.id) {
       ret = ret + Lua.tr("playerstr_self")
     }
     return ret;
