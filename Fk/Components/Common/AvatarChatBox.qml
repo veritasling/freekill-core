@@ -6,7 +6,7 @@ import QtQuick.Layouts
 
 import Fk.Widgets as W
 import Fk
-import Fk.Components.LunarLTK
+import LunarLtk.Components
 
 Rectangle {
   color: "transparent"

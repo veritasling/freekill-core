@@ -92,7 +92,7 @@ function General:__touistring()
 end
 function General:__toqml()
   return {
-    uri = "Fk.Components.LunarLTK",
+    uri = "LunarLtk.Components",
     name = "GeneralCardItem",
 
     -- TODO 虚拟卡

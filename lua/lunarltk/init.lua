@@ -56,7 +56,7 @@ Fk:addBoardGame {
   client_klass = require "lunarltk.client.client",
   engine = Fk,
   page = {
-    uri = "Fk.Pages.LunarLTK",
+    uri = "LunarLtk.Pages",
     name = "Room",
   },
   ui_settings = settings,

@@ -145,7 +145,7 @@ function Player:__touistring()
 end
 function Player:__toqml()
   return {
-    uri = "Fk.Components.LunarLTK",
+    uri = "LunarLtk.Components",
     name = "PhotoBase",
 
     -- 屋檐了，烂QML

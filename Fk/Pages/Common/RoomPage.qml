@@ -197,7 +197,7 @@ Item {
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
-        overviewLoader.overviewSource = "Fk.Pages.LunarLTK";
+        overviewLoader.overviewSource = "LunarLtk.Pages";
         overviewLoader.overviewType = "GeneralPool";
         overviewDialog.open();
       }
@@ -241,7 +241,7 @@ Item {
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
-        overviewLoader.overviewSource = "Fk.Pages.LunarLTK";
+        overviewLoader.overviewSource = "LunarLtk.Pages";
         overviewLoader.overviewType = "Generals";
         overviewDialog.open();
         overviewLoader.item.loadPackages();
@@ -256,7 +256,7 @@ Item {
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
-        overviewLoader.overviewSource = "Fk.Pages.LunarLTK";
+        overviewLoader.overviewSource = "LunarLtk.Pages";
         overviewLoader.overviewType = "Cards";
         overviewDialog.open();
         overviewLoader.item.loadPackages();
@@ -352,7 +352,7 @@ Item {
     }
     Loader {
       id: overviewLoader
-      property string overviewSource: "Fk.Pages.LunarLTK"
+      property string overviewSource: "LunarLtk.Pages"
       property string overviewType: "GeneralPool"
       anchors.centerIn: parent
       width: parent.width / Config.winScale
@@ -603,7 +603,7 @@ Item {
         case "Flower": {
           const fromId = pid;
           const toId = parseInt(splited[1]);
-          const component = Qt.createComponent("Fk.Components.LunarLTK.ChatAnim", type);
+          const component = Qt.createComponent("LunarLtk.Components.ChatAnim", type);
           if (component.status !== Component.Ready) {
             console.warn(component.errorString());
             return false;

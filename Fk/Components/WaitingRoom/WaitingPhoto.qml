@@ -1,7 +1,7 @@
 import QtQuick
 
 import Fk
-import Fk.Components.LunarLTK
+import LunarLtk.Components
 
 PhotoBase {
   id: root

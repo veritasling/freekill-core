@@ -107,7 +107,7 @@ function Skill:__touistring()
 end
 function Skill:__toqml()
   return {
-    uri = "Fk.Components.LunarLTK",
+    uri = "LunarLtk.Components",
     name = "SkillButton",
 
     prop = {

@@ -222,7 +222,7 @@ function Card:__toqml()
   end
 
   return {
-    uri = "Fk.Components.LunarLTK",
+    uri = "LunarLtk.Components",
     name = "CardItem",
 
     prop = {

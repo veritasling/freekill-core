@@ -144,7 +144,7 @@ function ModManager:getBoardGame(name)
     client_klass = Client,
     engine = Fk,
     page = {
-      uri = "Fk.Pages.LunarLTK",
+      uri = "LunarLtk.Pages",
       name = "Room",
     }
   }
