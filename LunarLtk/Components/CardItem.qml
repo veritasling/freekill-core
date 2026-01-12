@@ -34,7 +34,9 @@ Game.PokerCard {
   footnoteVisible: dataModel.footnoteVisible
   known: dataModel.known
 
-  property int holding_event_id: 0
+  property bool markVisible: false
+
+  property string prohibitReason: ""
 
   hoverHandler.cursorShape: selectable ? Qt.PointingHandCursor : Qt.ArrowCursor
 
@@ -108,7 +110,7 @@ Game.PokerCard {
     columns: 2
     rowSpacing: root.cardScale
     columnSpacing: 0
-    visible: root.known
+    visible: root.known && root.markVisible
     Repeater {
       model: root.dataModel.marks
       delegate: cardMarkDelegate
@@ -130,6 +132,6 @@ Game.PokerCard {
     wrapMode: Text.WrapAnywhere
     style: Text.Outline
     styleColor: "red"
-    text: root.dataModel.prohibitReason
+    text: root.prohibitReason
   }
 }

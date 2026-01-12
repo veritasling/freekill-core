@@ -44,7 +44,7 @@ Item {
     card.selectable = false;
     card.clicked.connect(selectCard);
     card.clicked.connect(adjustCards);
-    card.doubleClicked.connect(doubleClickCard);
+    // card.doubleClicked.connect(doubleClickCard);
     card.released.connect(updateCardReleased);
     card.startDrag.connect(updateCardDragging);
   }
@@ -58,7 +58,7 @@ Item {
       card.selectable = false;
       card.clicked.disconnect(selectCard);
       card.selectedChanged.disconnect(adjustCards);
-      card.doubleClicked.disconnect(doubleClickCard);
+      // card.doubleClicked.disconnect(doubleClickCard);
       card.released.disconnect(updateCardReleased);
       card.startDrag.disconnect(updateCardDragging);
       card.prohibitReason = "";
@@ -195,7 +195,7 @@ Item {
   }
 
   function selectCard(card) {
-    if (card.selectable) cardSelected(card.cid, card.selected);
+    if (card.selectable) cardSelected(card.dataModel.cardId, card.selected);
     adjustCards();
   }
 
@@ -229,7 +229,7 @@ Item {
     uiUpdate["CardItem"]?.forEach(cdata => {
       for (let i = 0; i < cards.length; i++) {
         const card = cards[i];
-        if (card.cid === cdata.id) {
+        if (card.dataModel.cardId === cdata.id) {
           card.selectable = cdata.enabled;
           card.selected = cdata.selected;
           break;

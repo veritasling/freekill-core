@@ -21,17 +21,14 @@ Item {
     area.add(inputs);
   }
 
-  function remove(outputs, _, visibleData) {
+  function remove(outputs) {
     const datas = [];
 
-    for (const cid of outputs) {
-      let prop;
-      if (visibleData) prop = { known: !!visibleData[cid.toString()] };
-
+    for (const dataModel of outputs) {
       datas.push({
         uri: "LunarLtk.Components",
         name: "CardItem",
-        prop: { dataModel: Ltk.createCardModel(cid, prop) },
+        prop: { dataModel },
       })
     }
 

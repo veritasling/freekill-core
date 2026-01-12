@@ -153,7 +153,7 @@ RowLayout {
 
     uiUpdate["_delete"]?.forEach(data => {
       if (data.type == "CardItem") {
-        const card = handcardAreaItem.remove([data.id])[0];
+        const card = handcardAreaItem.remove([Ltk.createCardModel(data.id)])[0];
         card.origX = parentPos.x;
         card.origY = parentPos.y;
         card.destroyOnStop();
@@ -162,16 +162,17 @@ RowLayout {
     });
     uiUpdate["_new"]?.forEach(dat => {
       if (dat.type == "CardItem") {
-        const data = Ltk.getCardData(dat.data.id);
-        data.x = parentPos.x;
-        data.y = parentPos.y;
-        const card = component.createObject(roomScene, data);
+        const card = component.createObject(roomScene, {
+          x: parentPos.x,
+          y: parentPos.y,
+          dataModel: Ltk.createCardModel(dat.data.id),
+        });
         card.footnoteVisible = true;
         card.markVisible = false;
         card.footnote = Lua.tr(dat.ui_data.footnote);
         const vcard = Ltk.getVirtualEquipData(0, dat.data.id);
         if (vcard) {
-          card.virt_name = vcard.name;
+          card.dataModel.virtName = vcard.name;
         }
         handcardAreaItem.add(card);
       }

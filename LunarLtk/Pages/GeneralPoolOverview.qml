@@ -20,6 +20,7 @@ W.PageBase {
   Component {
     id: avatarCard
     Item {
+      required property var modelData
       width: 64; height: 64
       Avatar {
         general: modelData
@@ -60,6 +61,7 @@ W.PageBase {
       model: Config.favoriteGenerals
       delegate: Item {
         width: 64; height: 64
+        required property var modelData
         Avatar {
           general: modelData
           detailed: true
@@ -168,6 +170,8 @@ W.PageBase {
     }
     delegate: RowLayout {
       width: listView.width
+      required property var model
+      id: sbqt
 
       Item {
         Layout.alignment: Qt.AlignTop
@@ -179,7 +183,7 @@ W.PageBase {
         }
         Text {
           id: pkgNameText
-          text: Lua.tr(pkname)
+          text: Lua.tr(model.pkname)
           font.pixelSize: 16
           textFormat: Text.RichText
           wrapMode: Text.WrapAnywhere
@@ -194,8 +198,7 @@ W.PageBase {
         rowSpacing: 4; columnSpacing: 4
         Repeater {
           id: repeater
-          model: JSON.parse(generals)
-          property var enableGenerals: JSON.parse(generals)
+          model: JSON.parse(sbqt.model.generals)
           delegate: avatarCard
         }
       }

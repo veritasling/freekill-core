@@ -144,9 +144,9 @@ PhotoBase {
       specialContainer.add(inputs);
     }
 
-    function remove(inputs, areaName) {
+    function remove(outputs, areaName) {
       updatePileInfo(areaName);
-      return specialContainer.remove(inputs);
+      return specialContainer.remove(outputs);
     }
 
     function updateCardPosition(a) {

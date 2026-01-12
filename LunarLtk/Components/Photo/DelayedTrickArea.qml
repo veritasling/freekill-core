@@ -70,7 +70,7 @@ Item {
     inputs.forEach(card => {
       const v = Ltk.getVirtualEquipData(parent.playerid, card.cid);
       let icon;
-      const cardName = v ? v.name : card.name;
+      const cardName = v ? v.name : card.dataModel.name;
       for (let i = 0; i < cards.count; i++) {
         const currentItem = cards.get(i);
         if (currentItem.name === cardName) {
@@ -81,7 +81,7 @@ Item {
       if (cids[cardName] === undefined) {
         cids[cardName] = [];
       }
-      cids[cardName].push(v ? v.cid : card.cid);
+      cids[cardName].push(v ? v.cid : card.dataModel.cardId);
       if (!icon) {
         cards.append({ name: cardName, len: 1 });
       } else {

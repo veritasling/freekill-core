@@ -153,34 +153,17 @@ function getAreaItem(area, id) {
   return photo.getAreaItem(area);
 }
 
-function moveCards(data) {
-  const moves = data.merged;
-  for (let i = 0; i < moves.length; i++) {
-    const move = moves[i];
-    const from = getAreaItem(move.fromArea, move.from);
-    const to = getAreaItem(move.toArea, move.to);
-    if (!from || !to || (from === to && from !== tablePile) || (from === tablePile && move.toArea === Ltk.Card.DiscardPile))
-      continue;
-    const items = from.remove(move.ids, move.fromSpecialName, data);
-    items.forEach((item) => item.dataModel.known = !!data[item.dataModel.cardId.toString()]); // updata card visible. must be before move animation
-    if (to === tablePile) {
-      items.forEach((item) => item.holding_event_id = data.event_id);
-      let vanished = items.filter(c => c.cid === -1);
-      if (vanished.length > 0) {
-        drawPile.add(vanished, move.specialName);
-        drawPile.updateCardPosition(true);
-      }
-      vanished = items.filter(c => c.cid !== -1);
-      if (vanished.length > 0) {
-        to.add(vanished, move.specialName);
-        to.updateCardPosition(true);
-      }
-    } else {
-      if (items.length > 0)
-        to.add(items, move.specialName);
-      to.updateCardPosition(true);
-    }
-  }
+function moveCards(move, data) {
+  const from = getAreaItem(move.fromArea, move.from);
+  const to = getAreaItem(move.toArea, move.to);
+  if (!from || !to) return;
+  if (from === to && from !== tablePile) return;
+  if (from === tablePile && move.toArea === Ltk.Card.DiscardPile) return;
+
+  const items = from.remove(data, move.fromSpecialName);
+  if (items.length > 0)
+    to.add(items, move.specialName);
+  to.updateCardPosition(true);
 }
 
 const suitInteger = {
@@ -959,11 +942,6 @@ callbacks["AskForCardsAndChoice"] = (sender, data) => {
   box.extra_data = extra_data;
 
   roomScene.popupBox.moveToCenter();
-}
-
-callbacks["MoveCards"] = (sender, moves) => {
-  // jsonData: merged moves
-  moveCards(moves);
 }
 
 // 切换状态 -> 向Lua询问UI情况

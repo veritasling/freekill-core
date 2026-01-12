@@ -22,11 +22,12 @@ Item {
   }
 
   function remove(outputs) {
-    let result = area.remove(outputs, (a, b) => a === b.cid);
-    for (const cd of result) {
-      const state = Ltk.getCardData(cd.cid);
-      cd.setData(state);
-    }
+    let result = area.remove(outputs, (a, b) => {
+      if (a.cardId === b.dataModel.cardId) {
+        b.dataModel = a;
+        return true;
+      }
+    });
     return result;
   }
 

@@ -28,16 +28,20 @@ QtObject {
   property int roundCount       // 轮数
   property int playedTime       // 对局已经过的时长
 
-  property list<PhotoModel> players // 所有玩家的photo所需数据（包括自己的）
+  property list<PhotoModel> players: [] // 所有玩家的photo所需数据（包括自己的）
 
   // banners，细节与PhotoModel的marks一致。
   property list<var> banners: []
 
   // 我们主视角的数据在此
-  readonly property DashboardModel dashboard: DashboardModel {}
+  property DashboardModel dashboard: DashboardModel {}
+
+  // 处理区中的ui常驻卡牌
+  property list<CardModel> processing: [];
 
   signal seatChanged(); // 座位排序后的信号
   signal playerAdded(PhotoModel model); // 新玩家加入的信号（addNpc）
+  signal cardsMoved(var move, var models);
 
   function getTimeString(time) {
     let s = time % 60;
@@ -131,6 +135,33 @@ QtObject {
     playerAdded(model);
   }
 
+  function moveCards(move, data) {
+    const getCardsModel = (area, playerid) => {
+      if (area === Ltk.Card.Processing) {
+        return processing;
+      } else if (area === Ltk.Card.PlayerHand && playerid === Cpp.self.id) {
+        return dashboard.handcards;
+      }
+      return null;
+    };
+
+    const fromModel = getCardsModel(move.fromArea, move.from);
+    const toModel = getCardsModel(move.toArea, move.to);
+
+    const models = move.ids.map(id => {
+      let card;
+      if (fromModel) {
+        const i = fromModel.findIndex(e => e.cardId === id);
+        if (i !== -1) card = fromModel.splice(i, 1)[0];
+      }
+      return card || Ltk.createCardModel(id, { known: !!data[id.toString()] });
+    });
+
+    if (toModel) toModel.push(...models);
+
+    cardsMoved(move, models);
+  }
+
   // 确定只会修改model属性的逻辑都搬家到这里
   function setupCallbacks() {
     roomPage.addCallback(Command.ArrangeSeats, arrangeSeats);
@@ -139,6 +170,9 @@ QtObject {
     roomPage.addCallback(Command.SetPlayerMark, setPlayerMark);
     roomPage.addCallback(Command.SetBanner, setBanner);
     roomPage.addCallback(Command.UpdateLimitSkill, updateLimitSkill);
+    roomPage.addCallback(Command.MoveCards, (_, data) => {
+      for (const move of data.merged) moveCards(move, data);
+    });
     roomPage.addCallback("AddNpc", addNpc);
   }
 

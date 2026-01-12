@@ -100,15 +100,16 @@ Item {
       delegate: ItemDelegate {
         width: listView.width / 5
         height: 40
+        required property var model
 
         Text {
-          text: Lua.tr(name)
+          text: Lua.tr(parent.model.name)
           color: "#E4D5A0"
           anchors.centerIn: parent
         }
 
         onClicked: {
-          generalModel = Ltk.getGenerals(packages.get(index).name);
+          generalModel = Ltk.getGenerals(model.name);
           stack.push(generalList);
         }
       }
@@ -134,6 +135,7 @@ Item {
         cellWidth: 100
 
         delegate: GeneralCardItem {
+          required property var modelData
           autoBack: false
           name: modelData
           onClicked: {

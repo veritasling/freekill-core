@@ -45,6 +45,7 @@ W.PageBase {
 
     onSeatChanged: Logic.arrangePhotos();
     onPlayerAdded: model => roomScene.photoModel.push(model);
+    onCardsMoved: (move, data) => Logic.moveCards(move, data);
   }
 
   MediaPlayer {
@@ -856,7 +857,6 @@ W.PageBase {
     addCallback(Command.AskForPoxi, Logic.callbacks["AskForPoxi"]);
     addCallback(Command.AskForMoveCardInBoard, Logic.callbacks["AskForMoveCardInBoard"]);
     addCallback(Command.AskForCardsAndChoice, Logic.callbacks["AskForCardsAndChoice"]);
-    addCallback(Command.MoveCards, Logic.callbacks["MoveCards"]);
     addCallback(Command.PlayCard, Logic.callbacks["PlayCard"]);
     addCallback(Command.LoseSkill, Logic.callbacks["LoseSkill"]);
     addCallback(Command.AddSkill, Logic.callbacks["AddSkill"]);
