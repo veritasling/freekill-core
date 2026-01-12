@@ -21,46 +21,31 @@ Game.PokerCard {
   width: 93 * cardScale
   height: 130 * cardScale
 
-  property string name: "slash"
-  property string extension: ""
-  property string virt_name: ""
-  property int type: 0
-  property string subtype: ""
+  required property CardModel dataModel
 
-  property string prohibitReason: ""
-
-  property bool multiple_targets: false
-
-  property var mark: ({})
-  property bool markVisible: false
-
-  // properties for animation and game system
-  property int cid: 0
-  property int virt_id: 0
-
-  property bool showDetail: true
+  suit: dataModel.suit
+  number: dataModel.number
+  color: dataModel.color
+  footnote: dataModel.footnote
+  footnoteVisible: dataModel.footnoteVisible
+  known: dataModel.known
 
   property int holding_event_id: 0
 
   hoverHandler.cursorShape: selectable ? Qt.PointingHandCursor : Qt.ArrowCursor
 
-  signal toggleDiscards()
-  signal thrown()
-  signal entered()
-  signal exited()
-  signal generalChanged()   // For choose general freely
-
+  property bool showDetail: true
   onRightClicked: {
     if (!showDetail || !known) return;
     roomScene.startCheat("CardDetail", { card: this });
   }
 
-  cardFrontSource: SkinBank.getCardPicture(cid || name)
+  cardFrontSource: SkinBank.getCardPicture(dataModel.cardId || dataModel.name)
   cardBackSource: SkinBank.searchBuiltinPic("/image/card/", "card-back")
 
   Rectangle {
     id: virt_rect
-    visible: known && root.virt_name !== "" && root.virt_name !== root.name
+    visible: root.known && root.dataModel.virtName && root.dataModel.virtName !== root.dataModel.name
     width: parent.width
     height: 20 * root.cardScale
     y: 40 * root.cardScale
@@ -69,26 +54,25 @@ Game.PokerCard {
     radius: 4 * root.cardScale
     border.color: "black"
     border.width: 1
-  }
 
-  Text {
-    visible: virt_rect.visible
-    anchors.centerIn: virt_rect
-    font.pixelSize: Math.floor(16 * root.cardScale)
-    font.family: Config.libianName
-    font.letterSpacing: -0.6
-    text: Lua.tr(root.virt_name)
+    Text {
+      anchors.centerIn: parent
+      font.pixelSize: Math.floor(16 * root.cardScale)
+      font.family: Config.libianName
+      font.letterSpacing: -0.6
+      text: Lua.tr(root.dataModel.virtName)
+    }
   }
 
   Component {
     id: cardMarkDelegate
     Item {
-      visible : markVisible || modelData.k.includes("-public")
+      required property var modelData
+      visible: root.known || modelData.origName.includes("-public")
       width: root.width / 2 * root.cardScale
       height: 16 * root.cardScale
       Rectangle {
-        id: mark_rect
-        width: mark_text.width + 12
+        width: markText.width + 12
         height: 16 * root.cardScale
         // color: "#A50330"
         radius: 4 * root.cardScale
@@ -101,18 +85,12 @@ Game.PokerCard {
         }
       }
       Text {
-        id: mark_text
+        id: markText
         x: 2
         font.pixelSize: Math.floor(16 * root.cardScale)
         font.family: Config.libianName
         font.letterSpacing: -0.6
-        text: {
-          let ret = Lua.tr(modelData.k);
-          if (!modelData.k.startsWith("@@")) {
-            ret += Lua.tr(modelData.v.toString());
-          }
-          return ret;
-        }
+        text: parent.modelData.value
         color: "white"
         style: Text.Outline
         styleColor: "purple"
@@ -126,9 +104,9 @@ Game.PokerCard {
     columns: 2
     rowSpacing: root.cardScale
     columnSpacing: 0
-    visible: known
+    visible: root.known
     Repeater {
-      model: mark
+      model: root.dataModel.marks
       delegate: cardMarkDelegate
     }
   }
@@ -148,38 +126,6 @@ Game.PokerCard {
     wrapMode: Text.WrapAnywhere
     style: Text.Outline
     styleColor: "red"
-    text: prohibitReason
-  }
-
-  function setData(data) {
-    cid = data.cid;
-    virt_id = data.virt_id ?? 0;
-    name = data.name;
-    suit = data.suit;
-    number = data.number;
-    color = data.color;
-    type = data.type ? data.type : 0
-    subtype = data.subtype ? data.subtype : "";
-    virt_name = data.virt_name ? data.virt_name : "";
-    mark = data.mark ?? {};
-    if (data.markVisible) {
-      markVisible = true;
-    }
-  }
-
-  function toData() {
-    const data = {
-      cid: cid,
-      virt_id: virt_id,
-      name: name,
-      suit: suit,
-      number: number,
-      color: color,
-      type: type,
-      subtype: subtype,
-      virt_name: virt_name,
-      mark: mark,
-    };
-    return data;
+    text: root.dataModel.prohibitReason
   }
 }

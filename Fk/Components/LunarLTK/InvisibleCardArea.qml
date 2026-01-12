@@ -21,20 +21,16 @@ Item {
   }
 
   function remove(outputs, _, visibleData) {
-    const component = Qt.createComponent("CardItem.qml");
-    if (component.status !== Component.Ready)
-      return [];
-
     const datas = [];
 
-    for (let i = 0; i < outputs.length; i++) {
-      const prop = Ltk.getCardData(outputs[i]);
-      if (visibleData) prop.known = !!visibleData[outputs[i].toString()];
+    for (const cid of outputs) {
+      let prop;
+      if (visibleData) prop = { known: !!visibleData[cid.toString()] };
 
       datas.push({
         uri: "Fk.Components.LunarLTK",
         name: "CardItem",
-        prop,
+        prop: { dataModel: Ltk.createCardModel(cid, prop) },
       })
     }
 

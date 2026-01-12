@@ -162,7 +162,7 @@ function moveCards(data) {
     if (!from || !to || (from === to && from !== tablePile) || (from === tablePile && move.toArea === Ltk.Card.DiscardPile))
       continue;
     const items = from.remove(move.ids, move.fromSpecialName, data);
-    items.forEach((item) => item.known = !!data[item.cid.toString()]); // updata card visible. must be before move animation
+    items.forEach((item) => item.dataModel.known = !!data[item.dataModel.cardId.toString()]); // updata card visible. must be before move animation
     if (to === tablePile) {
       items.forEach((item) => item.holding_event_id = data.event_id);
       let vanished = items.filter(c => c.cid === -1);

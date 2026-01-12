@@ -417,4 +417,22 @@ QtObject {
       });
     }
   }
+
+  function createCardModel(cardId, additionalProp) {
+    const component = Qt.createComponent("Fk.Components.LunarLTK", "CardModel");
+    const data = Ltk.getCardData(cardId);
+    const { name, extension, number, suit, color, type, subtype } = data;
+    const prop = {
+      cardId: data.cid,
+      marks: [],
+      name, extension, number, suit, color, type, subtype,
+    };
+
+    for (const {k, v} of data.mark) {
+      Ltk.setMark(prop.marks, k, v);
+    }
+
+    if (additionalProp instanceof Object) Object.assign(prop, additionalProp);
+    return component.createObject(null, prop);
+  }
 }

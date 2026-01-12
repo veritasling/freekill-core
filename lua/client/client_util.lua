@@ -110,7 +110,6 @@ function GetCardData(id, filterCard)
     mark = mark,
     type = card.type,
     subtype = cardSubtypeStrings[card.sub_type],
-    multiple_targets = card.multiple_targets,
   }
   if filterCard and card.skillName ~= "" then
     local orig = Fk:getCardById(id, true)

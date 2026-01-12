@@ -67,6 +67,8 @@ W.PageBase {
       autoBack: false
       showDetail: false
       property int dupCount: 0
+      required property var modelData
+      dataModel: Ltk.createCardModel(modelData.cid);
 
       Text {
         anchors.right: parent.right
@@ -78,19 +80,11 @@ W.PageBase {
       }
 
       Component.onCompleted: {
-        const data = modelData;
-        if (!data.cards) {
-          name = data.name;
-          suit = data.suit;
-          number = data.number;
-          cid = data.cid;
-        } else {
-          name = data.name;
-          cid = data.cid;
-          suit = "";
-          number = 0;
-          color = "";
-          dupCount = data.cards.length;
+        if (modelData.cards) {
+          dataModel.suit = "";
+          dataModel.number = 0;
+          dataModel.color = "";
+          dupCount = modelData.cards.length;
         }
       }
 
@@ -197,7 +191,7 @@ W.PageBase {
     property int cid: 1
     property var cards
     function updateCard() {
-      const data = Ltk.getCardData(cid);
+      const data = Ltk.createCardModel(cid);
       detailFlickable.contentY = 0; // 重置滚动条
       const suitTable = {
         spade: "♠", heart: '<font color="red">♥</font>',
@@ -205,13 +199,13 @@ W.PageBase {
       }
 
       if (!cards) {
-        detailCard.setData(data);
+        detailCard.dataModel = data;
         detailCard.dupCount = 0;
       } else {
-        detailCard.cid = cid;
-        detailCard.color = "";
-        detailCard.suit = "";
-        detailCard.number = 0;
+        data.color = "";
+        data.suit = "";
+        data.number = 0;
+        detailCard.dataModel = data;
         detailCard.dupCount = cards.length;
       }
       detailCard.known = true;
@@ -254,7 +248,7 @@ W.PageBase {
         CardItem {
           id: detailCard
           Layout.alignment: Qt.AlignHCenter
-          cid: 1
+          dataModel: Ltk.createCardModel(1)
           known: false
           showDetail: false
 
