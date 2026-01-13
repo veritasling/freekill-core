@@ -239,12 +239,12 @@ W.PageBase {
         enabled: dashboard.sortable
         onClicked: {
           if (dashboard.sortable) {
-            let sortMethods = [];
+            let sortMethod = 0;
             for (let index = 0; index < sortMenuRepeater.count; index++) {
               var tCheckBox = sortMenuRepeater.itemAt(index)
-              sortMethods.push(tCheckBox.checked)
+              if (tCheckBox.checked) sortMethod = index;
             }
-            Logic.sortHandcards(sortMethods);
+            roomScene.dataModel.dashboard.sortHandcards(sortMethod);
           }
         }
 
@@ -267,23 +267,6 @@ W.PageBase {
           font.pixelSize: 20
         }
 
-        /*
-        MetroButton {
-          id: sideSort
-          anchors.left: parent.right
-          height: parent.height
-          text: "▶"
-          visible: !sortMenu.visible && (hovered || parent.hovered)
-          onClicked: {
-            if (sortMenu.visible) {
-              sortMenu.close();
-            } else {
-              sortMenu.open();
-            }
-          }
-        }
-        */
-
         Menu {
           id: sortMenu
           x: parent.width
@@ -300,7 +283,7 @@ W.PageBase {
             id: sortMenuRepeater
             model: ["Sort by Type", "Sort by Number", "Sort by Suit"]
 
-            CheckBox {
+            RadioButton {
               id: control
               text: "<font color='white'>" + Lua.tr(modelData) + "</font>"
               checked: modelData === "Sort by Type"
@@ -341,6 +324,8 @@ W.PageBase {
     width: roomScene.width - dashboardBtn.width
     anchors.top: roomArea.bottom
     anchors.left: dashboardBtn.right
+
+    dataModel: roomScene.dataModel.dashboard
   }
 
   Item {

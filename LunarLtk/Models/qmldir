@@ -3,4 +3,4 @@ module LunarLtk.Models
 RoomModel 1.0 RoomModel.qml
 CardModel 1.0 CardModel.qml
 PhotoModel 1.0 PhotoModel.qml
-DashboardModel 1.0 PhotoModel.qml
+DashboardModel 1.0 DashboardModel.qml

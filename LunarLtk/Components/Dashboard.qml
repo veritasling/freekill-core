@@ -9,6 +9,23 @@ import LunarLtk
 RowLayout {
   id: root
 
+  required property DashboardModel dataModel
+
+  Connections {
+    target: dataModel
+    function onHandcardsSorted() {
+      const sortedCards = [];
+      const cards = handcardAreaItem.cards;
+      for (const model of dataModel.handcards) {
+        const i = cards.findIndex(cd => cd.dataModel === model);
+        if (i !== -1) sortedCards.push(cards.splice(i, 1)[0]);
+      }
+      sortedCards.push(...cards);
+      handcardAreaItem.cards = sortedCards;
+      handcardAreaItem.updateCardPosition(true);
+    }
+  }
+
   property var self
   property alias handcardArea: handcardAreaItem
 
