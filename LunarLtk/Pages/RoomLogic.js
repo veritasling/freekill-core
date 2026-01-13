@@ -369,7 +369,7 @@ function setEmotion(id, emotion, isCardId) {
   let photo;
   if (isCardId === true) {
     roomScene.tableCards.forEach((v) => {
-      if (v.cid === id) {
+      if (v.dataModel.cardId === id) {
         photo = v;
         return;
       }
@@ -398,49 +398,6 @@ function setEmotion(id, emotion, isCardId) {
     animation.finished.connect(() => animation.destroy());
   }
   animation.start();
-}
-
-function setCardFootnote(id, footnote, virtual) {
-  let card;
-  roomScene.tableCards.forEach((v) => {
-    if ((virtual? v.virt_id : v.cid) === id) {
-      card = v;
-      return;
-    }
-  });
-
-  if (!card) {
-    return;
-  }
-
-  card.footnote = footnote;
-  card.footnoteVisible = true;
-}
-
-callbacks["SetCardFootnote"] = (sender, data) => {
-  const [id, note, virtual] = data;
-  setCardFootnote(id, note, virtual);
-}
-
-function setCardVirtName(id, name, virtual) {
-  let card;
-  roomScene.tableCards.forEach((v) => {
-    if ((virtual? v.virt_id : v.cid) === id) {
-      card = v;
-      return;
-    }
-  });
-
-  if (!card) {
-    return;
-  }
-
-  card.virt_name = name;
-}
-
-callbacks["SetCardVirtName"] = (sender, data) => {
-  const [ids, note, virtual] = data;
-  ids.forEach(id => setCardVirtName(id, note, virtual));
 }
 
 callbacks["ShowVirtualCard"] = (sender, data) => {

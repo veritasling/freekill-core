@@ -141,6 +141,10 @@ QtObject {
         return processing;
       } else if (area === Ltk.Card.PlayerHand && playerid === Cpp.self.id) {
         return dashboard.handcards;
+      } else if (area === Ltk.Card.PlayerEquip) {
+        return getPhoto(playerid)?.equips;
+      } else if (area === Ltk.Card.PlayerJudge) {
+        return getPhoto(playerid)?.delayedTricks;
       }
       return null;
     };
@@ -162,6 +166,23 @@ QtObject {
     cardsMoved(move, models);
   }
 
+  function setCardFootnote(_, data) {
+    const [id, note, virtual] = data;
+    const v = processing.find(e => e[virtual ? "virtId" : "cardId"] === id);
+    if (v) {
+      v.footnote = note;
+      v.footnoteVisible = true;
+    }
+  }
+
+  function setCardVirtName(_, data) {
+    const [ids, note, virtual] = data;
+    ids.forEach(id => {
+      const v = processing.find(e => e[virtual ? "virtId" : "cardId"] === id);
+      if (v) v.virtName = note;
+    });
+  }
+
   // 确定只会修改model属性的逻辑都搬家到这里
   function setupCallbacks() {
     roomPage.addCallback(Command.ArrangeSeats, arrangeSeats);
@@ -173,6 +194,8 @@ QtObject {
     roomPage.addCallback(Command.MoveCards, (_, data) => {
       for (const move of data.merged) moveCards(move, data);
     });
+    roomPage.addCallback(Command.SetCardFootnote, setCardFootnote);
+    roomPage.addCallback(Command.SetCardVirtName, setCardVirtName);
     roomPage.addCallback("AddNpc", addNpc);
   }
 

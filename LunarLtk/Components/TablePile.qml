@@ -21,9 +21,8 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
   }
 
-  // FIXME: 重构需要
-  function inTable(cid) {
-    return Lua.client.processing_area.includes(cid);
+  function inTable(card) {
+    return Lua.client.processing_area.includes(card.dataModel.cardId);
   }
 
   Timer {
@@ -37,7 +36,7 @@ Item {
       if (toVanish) {
         for (i = 0; i < discardedCards.length; i++) {
           card = discardedCards[i];
-          if (card.busy || inTable(card.cid) || card.holding_event_id !== 0) {
+          if (card.busy || inTable(card)) {
             discardedCards.splice(i, 1);
             continue;
           }
@@ -52,14 +51,14 @@ Item {
 
         discardedCards = [];
         for (i = 0; i < cards.length; i++) {
-          if (cards[i].busy || inTable(cards[i].cid) || cards[i].holding_event_id !== 0)
+          if (cards[i].busy || inTable(cards[i]))
             continue;
           discardedCards.push(cards[i]);
         }
         toVanish = false;
       } else {
         for (i = 0; i < discardedCards.length; i++) {
-          if (!inTable((discardedCards[i].cid)))
+          if (!inTable((discardedCards[i])))
             discardedCards[i].selectable = false;
         }
         toVanish = true;
@@ -69,13 +68,10 @@ Item {
 
   function add(inputs) {
     area.add(inputs);
-    // if (!inputs instanceof Array)
     for (const c of inputs) {
       c.footnoteVisible = true;
       c.markVisible = false;
       c.selectable = true;
-      // c.height = c.height * 0.8;
-      // c.width = c.width * 0.8;
       c.cardScale = 0.8;
       if (Config.rotateTableCard) {
         c.rotation = (Math.random() - 0.5) * 5;
@@ -83,14 +79,12 @@ Item {
     }
   }
 
-  function remove(ids, _, visibleData) {
-    visibleData = visibleData ?? {};
+  function remove(models) {
     let i, j;
 
-    const to_remove = cards.filter(cd => {
-      return ids.includes(cd.cid) &&
-        cd.known === !!visibleData[cd.cid.toString()];
-    }).map(c => c.cid);
+    const to_remove = cards.filter(cd =>
+      models.find(e => e.cardId === cd.dataModel.cardId && cd.dataModel.known === e.known)
+    ).map(c => c.dataModel);
     let result = area.remove(to_remove);
     result.forEach(c => {
       const idx = discardedCards.indexOf(c);
@@ -99,14 +93,12 @@ Item {
       }
       c.footnoteVisible = false;
       c.selectable = false;
-      // c.height = c.height / 0.8;
-      // c.width = c.width / 0.8;
       c.cardScale = 1;
       c.rotation = 0;
     });
 
-    const vanished = ids.filter(id => {
-      return !result.find(cd => cd.cid === id);
+    const vanished = models.filter(e => {
+      return !result.find(cd => cd.dataModel.cardId === e.cardId);
     });
     result = result.concat(invisibleArea.remove(vanished));
 

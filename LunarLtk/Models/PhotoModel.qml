@@ -42,6 +42,10 @@ QtObject {
   property bool role_shown: false
   property list<int> handcards
 
+  // 需要直接显示出来的卡牌
+  property list<CardModel> delayedTricks: [];
+  property list<CardModel> equips: [];
+
   // 其他UI元素
 
   property var targetTip: []  // “可烈弓”之类的目标提示文本，已翻译好

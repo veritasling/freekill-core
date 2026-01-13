@@ -835,8 +835,6 @@ W.PageBase {
 
     addCallback(Command.NetStateChanged, netStateChanged);
     // TODO 摆烂了 反正这些后面也是得重构 懒得搬砖了
-    addCallback(Command.SetCardFootnote, Logic.callbacks["SetCardFootnote"]);
-    addCallback(Command.SetCardVirtName, Logic.callbacks["SetCardVirtName"]);
     addCallback(Command.ShowVirtualCard, Logic.callbacks["ShowVirtualCard"]);
     addCallback(Command.DestroyTableCard, Logic.callbacks["DestroyTableCard"]);
     addCallback(Command.DestroyTableCardByEvent, Logic.callbacks["DestroyTableCardByEvent"]);
