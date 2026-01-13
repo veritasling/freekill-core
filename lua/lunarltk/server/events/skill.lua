@@ -136,7 +136,6 @@ function SkillEffect:main()
 end
 
 function SkillEffect:clear()
-  self.room:destroyTableCardByEvent(self.id)
 end
 
 function SkillEffect:desc()

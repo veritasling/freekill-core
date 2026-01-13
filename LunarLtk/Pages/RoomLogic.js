@@ -166,7 +166,6 @@ function moveCards(move, data) {
   to.updateCardPosition(true);
 }
 
-
 function setEmotion(id, emotion, isCardId) {
   let path;
   if (OS === "Win") {
@@ -254,26 +253,6 @@ callbacks["ShowVirtualCard"] = (sender, data) => {
 
   tablePile.add(items);
   tablePile.updateCardPosition(true);
-}
-
-callbacks["DestroyTableCard"] = (sender, data) => {
-  for (let i = 0; i < tablePile.cards.length; i++) {
-    const card = tablePile.cards[i];
-    if (data.indexOf(card.virt_id) !== -1) {
-      //destroying the card immediately will cause animation errors
-      card.holding_event_id = 0;
-    }
-  }
-}
-
-callbacks["DestroyTableCardByEvent"] = (sender, data) => {
-  for (let i = 0; i < tablePile.cards.length; i++) {
-    const card = tablePile.cards[i];
-    if (card.holding_event_id >= data) {
-      //destroying the card immediately will cause animation errors
-      card.holding_event_id = 0;
-    }
-  }
 }
 
 function doIndicate(from, tos) {
@@ -993,16 +972,6 @@ callbacks["UpdateMiniGame"] = (sender, data) => {
 
 callbacks["EmptyRequest"] = (sender, data) => {
   roomScene.activate();
-}
-
-callbacks["UpdateDrawPile"] = (sender, j) => {
-  const data = parseInt(j);
-  roomScene.dataModel.drawPileNum = data;
-}
-
-callbacks["UpdateRoundNum"] = (sender, j) => {
-  const data = parseInt(j);
-  roomScene.dataModel.roundCount = data;
 }
 
 callbacks["ChangeSkin"] = (sender, data) => {

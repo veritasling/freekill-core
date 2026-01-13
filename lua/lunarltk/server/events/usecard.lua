@@ -293,7 +293,6 @@ function UseCard:clear()
       moveReason = fk.ReasonUse,
     })
   end
-  room:destroyTableCardByEvent(self.id)
 end
 
 ---@class GameEvent.RespondCard : GameEvent
@@ -379,7 +378,6 @@ function RespondCard:clear()
       moveReason = fk.ReasonResponse,
     })
   end
-  room:destroyTableCardByEvent(self.id)
 end
 
 ---@class GameEvent.CardEffect : GameEvent

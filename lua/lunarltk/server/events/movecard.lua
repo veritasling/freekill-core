@@ -213,7 +213,6 @@ function MoveCards:clear()
     end
     e = e.parent
   end
-  self.room:destroyTableCardByEvent(self.id)
 end
 
 local function convertOldMoveInfo(info)

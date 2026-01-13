@@ -65,7 +65,8 @@ QtObject {
 
   // 一秒5刷智慧
   function refreshData() {
-    drawPileNum = Lua.client.draw_pile.length;
+    drawPileNum = Lua.ev("#ClientInstance.draw_pile");
+    roundCount = Lua.client.getBanner("RoundCount") || 0;
     for (const model of players) {
       model.refreshData();
     }

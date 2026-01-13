@@ -821,8 +821,6 @@ W.PageBase {
     addCallback(Command.NetStateChanged, netStateChanged);
     // TODO 摆烂了 反正这些后面也是得重构 懒得搬砖了
     addCallback(Command.ShowVirtualCard, Logic.callbacks["ShowVirtualCard"]);
-    addCallback(Command.DestroyTableCard, Logic.callbacks["DestroyTableCard"]);
-    addCallback(Command.DestroyTableCardByEvent, Logic.callbacks["DestroyTableCardByEvent"]);
     addCallback(Command.UpdateHandcard, Logic.callbacks["UpdateHandcard"]);
     addCallback(Command.UpdateCard, Logic.callbacks["UpdateCard"]);
     addCallback(Command.UpdateSkill, Logic.callbacks["UpdateSkill"]);
@@ -859,8 +857,6 @@ W.PageBase {
     addCallback(Command.MiniGame, Logic.callbacks["MiniGame"]);
     addCallback(Command.UpdateMiniGame, Logic.callbacks["UpdateMiniGame"]);
     addCallback(Command.EmptyRequest, Logic.callbacks["EmptyRequest"]);
-    addCallback(Command.UpdateDrawPile, Logic.callbacks["UpdateDrawPile"]);
-    addCallback(Command.UpdateRoundNum, Logic.callbacks["UpdateRoundNum"]);
     addCallback(Command.ChangeSelf, Logic.callbacks["ChangeSelf"]);
     addCallback(Command.UpdateRequestUI, Logic.callbacks["UpdateRequestUI"]);
     addCallback(Command.GetPlayerHandcards, Logic.callbacks["GetPlayerHandcards"]);

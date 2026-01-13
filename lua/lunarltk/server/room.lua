@@ -3766,18 +3766,6 @@ function Room:showVirtualCard(card, player, footnote, event_id)
   self:doBroadcastNotify("ShowVirtualCard", { card, player and player.id, footnote, event_id or 0 })
 end
 
---- 将桌面上的虚拟牌在移出（仅动画）
----@param ids integer | integer[]
-function Room:destroyTableCard(ids)
-  self:doBroadcastNotify("DestroyTableCard", type(ids) == "table" and ids or { ids })
-end
-
---- 将桌面上的在该事件之后进入的卡牌移出（仅动画）
----@param id integer
-function Room:destroyTableCardByEvent(id)
-  self:doBroadcastNotify("DestroyTableCardByEvent", id)
-end
-
 ---@class AddNpcParams
 ---@field controller fk.ServerPlayer? 这名人机的初始控制者，默认人机自己
 ---@field general string? 初始武将，默认男士兵，不支持隐匿
