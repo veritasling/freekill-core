@@ -30,5 +30,7 @@ QtObject {
 
   property string footnote: ""  // footnote, e.g. "A use card to B"
   property bool footnoteVisible: false
+
+  // 与UI交互相关
 }
 

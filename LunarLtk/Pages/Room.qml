@@ -87,9 +87,8 @@ W.PageBase {
           dashboard.pending_skill = "";
 
           for (const model of photoModel) {
-            const item = model.photoItem;
-            item.state = "normal";
-            item.selected = false;
+            model.state = "normal";
+            model.selected = false;
           }
 
           if (popupBox.item != null) {
@@ -148,11 +147,6 @@ W.PageBase {
         required property PhotoModel modelData
         dataModel: modelData
 
-        onSelectedChanged: {
-          if ( state === "candidate" )
-            Ltk.updateRequestUI("Photo", playerid, "click", { selected, autoTarget: Config.autoTarget } );
-        }
-
         onRightClicked: {
           if (playerid === 0 || playerid === -1) {
             return;
@@ -163,7 +157,6 @@ W.PageBase {
 
         Component.onCompleted: {
           if (dataModel.index === 0) {
-            dashboard.self = this;
             enableChangeSkin = true;
           }
         }
@@ -700,7 +693,7 @@ W.PageBase {
     dashboard.applyChange(uiUpdate);
     const pdatas = uiUpdate["Photo"];
     pdatas?.forEach(pdata => {
-      const photo = Logic.getPhoto(pdata.id);
+      const photo = dataModel.getPhoto(pdata.id);
       photo.state = pdata.state;
       photo.selectable = pdata.enabled;
       photo.selected = pdata.selected;

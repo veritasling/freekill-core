@@ -197,14 +197,10 @@ function setEmotion(id, emotion, isCardId) {
   let photo;
   if (isCardId === true) {
     photo = roomScene.tableCards.find(v => v.dataModel.cardId === id);
-    if (!photo)
-      return;
   } else {
     photo = getPhoto(id);
-    if (!photo) {
-      return null;
-    }
   }
+  if (!photo) return;
 
   const animation = component.createObject(photo, {
     source: (OS === "Win" ? "file:///" : "") + path,
@@ -286,7 +282,7 @@ function doIndicate(from, tos) {
 callbacks["UpdateHandcard"] = (sender) => {
   roomScene.dashboard.handcardArea.cards.forEach((v) => {
     const id = v.cid;
-    if (Lua.evaluate(`ClientInstance:getCardArea(${id}) == Card.PlayerHand and ClientInstance:getCardOwner(${id}) == Cpp.self`)) {
+    if (Lua.evaluate(`ClientInstance:getCardArea(${id}) == Card.PlayerHand and ClientInstance:getCardOwner(${id}) == Self`)) {
       v.setData(Ltk.getCardData(id, true));
       v.known = Lua.selfPlayer.cardVisible(id);
       v.draggable = true;
@@ -843,7 +839,7 @@ callbacks["LogEvent"] = (sender, data) => {
   // jsonData: [Object object]
   switch (data.type) {
     case "Damage": {
-      const item = getPhotoOrDashboard(data.to);
+      const item = getPhoto(data.to);
       setEmotion(data.to, "damage");
       item.tremble();
       data.damageType = data.damageType || "normal_damage";
@@ -997,12 +993,8 @@ callbacks["ChangeSkin"] = (sender, data) => {
 callbacks["ChangeSelf"] = (sender, j) => {
   // move new selfPhoto to dashboard
   let order = new Array(photoModel.length);
-  for (let i = 0; i < photoModel.length; i++) {
-    const item = photoModel[i];
-    order[item.seatNumber - 1] = item.playerid;
-    if (item.playerid === Cpp.self.id) {
-      dashboard.self = photos.itemAt(i);
-    }
+  for (const model of photoModel) {
+    order[model.seatNumber - 1] = model.playerid;
   }
   dataModel.arrangeSeats(null, order);
 

@@ -24,7 +24,8 @@ PhotoBase {
   seatNumber: dataModel.seatNumber
   dead: dataModel.dead
 
-  property string status: "normal"
+  selectable: dataModel.selectable
+  onSelectedChanged: dataModel.selected = selected;
 
   property alias areasSealed: equipAreaItem
   property alias markArea: markAreaItem
@@ -49,7 +50,7 @@ PhotoBase {
     anchors.centerIn: parent
     loop: true
     scale: 0.825
-    visible: root.state === "candidate" && root.selected
+    visible: root.dataModel.state === "candidate" && root.selected
     running: visible
   }
 
@@ -58,7 +59,7 @@ PhotoBase {
     source: SkinBank.pixAnimDir + "selectable"
     anchors.centerIn: parent
     loop: true
-    visible: root.state === "candidate" && root.selectable
+    visible: root.dataModel.state === "candidate" && root.selectable
     running: visible
     scale: 0.75
   }
@@ -94,13 +95,6 @@ PhotoBase {
     source: SkinBank.photoDir + "equipbg"
     x: 23
     y: 91
-    scale: 0.75
-    transformOrigin: Item.TopLeft
-  }
-
-  Image {
-    source: root.status != "normal" ? SkinBank.statusDir + root.status : ""
-    x: -5
     scale: 0.75
     transformOrigin: Item.TopLeft
   }
@@ -250,7 +244,7 @@ PhotoBase {
   }
 
   Image {
-    visible: root.state === "candidate" && !root.selectable && !root.selected
+    visible: root.dataModel.state === "candidate" && !root.selectable && !root.selected
     source: SkinBank.photoDir + "disable"
     x: 23; y: -16
     scale: 0.75

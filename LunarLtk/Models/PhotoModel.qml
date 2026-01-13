@@ -47,7 +47,6 @@ QtObject {
   property list<CardModel> equips: [];
 
   // 其他UI元素
-
   property var targetTip: []  // “可烈弓”之类的目标提示文本，已翻译好
   property list<var> limitSkills: []  // 限定技区域，var的内容为 { skill, time }
 
@@ -63,6 +62,16 @@ QtObject {
   // - cheatSource: 应付pile和武将牌列表的玩意，一下子想不出好办法
   property list<var> marks: []
   property list<var> picMarks: [] // Photo特有，内容与marks一致
+
+  // 与UI交互相关
+  property string state: "normal" // normal - 正常 candidate - 待选
+  property bool selectable: false
+  property bool selected: false // 这个反过来被绑定
+
+  onSelectedChanged: {
+    if (state !== "candidate") return;
+    Ltk.updateRequestUI("Photo", playerid, "click", { selected, autoTarget: Config.autoTarget } );
+  }
 
   function updateHandcards() {
     handcards = luaPlayer.getCardIds("h");

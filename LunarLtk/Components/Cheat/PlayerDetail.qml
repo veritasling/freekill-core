@@ -320,7 +320,7 @@ Flickable {
 
     // 幽默记牌器环节 FIXME：帮忙补补翻译表 FIXME: 帮忙补补区域 FIXME: 帮忙整个重做
     skillDesc.append("------------------------------------");
-    const knownHandcards = Lua.evaluate(`Cpp.self.card_tracker:getPlayerKnownCards(${id}, Player.Hand)`);
+    const knownHandcards = Lua.evaluate(`Self.card_tracker:getPlayerKnownCards(${id}, Player.Hand)`);
     if (!knownHandcards) {
       skillDesc.append("没有已知手牌");
     } else {

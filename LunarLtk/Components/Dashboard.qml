@@ -26,7 +26,6 @@ RowLayout {
     }
   }
 
-  property var self
   property alias handcardArea: handcardAreaItem
 
   property string pending_skill: ""
@@ -70,7 +69,6 @@ RowLayout {
     Layout.preferredWidth: 175
     Layout.preferredHeight: 233
     Layout.rightMargin: -175 / 8 + (roomArea.width - 175 * 0.75 * 7) / 8
-    // handcards: handcardAreaItem.length
   }
 
   Connections {
@@ -80,9 +78,6 @@ RowLayout {
     }
     function onCardDoubleClicked(cardId, selected) {
       Ltk.updateRequestUI("CardItem", cardId, "doubleClick", { selected, doubleClickUse: Config.doubleClickUse, autoTarget: Config.autoTarget } );
-    }
-    function onLengthChanged() {
-      self.dataModel.updateHandcards();
     }
   }
 
@@ -117,10 +112,6 @@ RowLayout {
     disabledSkillNames = [];
     for (let i = 0; i < skillButtons.count; i++)
       skillButtons.itemAt(i).enabled = false;
-  }
-
-  function tremble() {
-    self.tremble();
   }
 
   function updateHandcards() {
