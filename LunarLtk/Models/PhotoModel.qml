@@ -6,7 +6,7 @@ QtObject {
   id: root
 
   property var photoItem
-  property var luaPlayer: Ltk.getPlayer(playerid)
+  readonly property var luaPlayer: Ltk.getPlayer(playerid)
 
   property int index: 0 // photo们在屏幕内的排位 用于arrangePhotos
 

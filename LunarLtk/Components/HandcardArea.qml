@@ -6,7 +6,9 @@ import LunarLtk
 import LunarLtk.Components
 
 Item {
-  id: area
+  id: root
+
+  required property DashboardModel dataModel
 
   property alias cards: cardArea.cards
   property alias length: cardArea.length
@@ -18,12 +20,18 @@ Item {
   property var draggingClickedPhoto
 
   signal cardSelected(int cardId, bool selected)
-  signal cardDoubleClicked(int cardId, bool selected)
+
+  Connections {
+    target: root.dataModel
+    function onHandcardsSorted() {
+      root.syncCards();
+    }
+  }
 
   CardArea {
     id: cardArea
     anchors.fill: parent
-    onLengthChanged: area.updateCardPosition(true);
+    onLengthChanged: root.updateCardPosition(true);
   }
 
   function add(inputs) {
@@ -61,7 +69,7 @@ Item {
       // card.doubleClicked.disconnect(doubleClickCard);
       card.released.disconnect(updateCardReleased);
       card.startDrag.disconnect(updateCardDragging);
-      card.prohibitReason = "";
+      card.dataModel.prohibitReason = "";
     }
     return result;
   }
@@ -73,10 +81,8 @@ Item {
       if (card.selected) {
         card.origY -= 20;
       }
-      if (!card.selectable) {
-        if (Config.hideUseless) {
-          card.origY += 60;
-        }
+      if (!card.selectable && Config.hideUseless) {
+        card.origY += 60;
       }
     });
 
@@ -191,7 +197,7 @@ Item {
   }
 
   function adjustCards() {
-    area.updateCardPosition(true);
+    updateCardPosition(true);
   }
 
   function selectCard(card) {
@@ -201,7 +207,7 @@ Item {
 
   function doubleClickCard(card) {
     if (Config.doubleClickUse) {
-      cardDoubleClicked(card.cid, card.selected);
+      Ltk.updateRequestUI("CardItem", card.dataModel.cardId, "doubleClick", { selected: card.selected, doubleClickUse: Config.doubleClickUse, autoTarget: Config.autoTarget } );
     }
   }
 
@@ -224,25 +230,43 @@ Item {
     updateCardPosition(true);
   }
 
-  function applyChange(uiUpdate) {
-    area.sortable = Ltk.canSortHandcards(Cpp.self.id);
-    uiUpdate["CardItem"]?.forEach(cdata => {
-      for (let i = 0; i < cards.length; i++) {
-        const card = cards[i];
-        if (card.dataModel.cardId === cdata.id) {
-          card.selectable = cdata.enabled;
-          card.selected = cdata.selected;
-          break;
-        }
-      }
-    });
-    updateCardPosition(true);
-    for (let i = 0; i < cards.length; i++) {
-      const card = cards[i];
-      if (!card.selectable) {
-        const reason = Ltk.getCardProhibitReason(card.cid);
-        card.prohibitReason = reason;
+  function syncCards() {
+    // sync expandedCards
+    const allCards = [...dataModel.handcards, ...dataModel.expandedCards];
+    const extractedCards = [];
+    for (const card of cards) {
+      const idx = allCards.findIndex(e => e === card.dataModel);
+      if (idx !== -1) {
+        allCards.splice(idx, 1);
+      } else {
+        extractedCards.push(card.dataModel);
       }
     }
+
+    const myPos = roomScene.mapFromItem(root, 0, 0);
+    for (const card in remove(extractedCards)) {
+      cards.splice(cards.indexOf(card), 1);
+      card.origX = myPos.x + width;
+      card.origY = myPos.y;
+      card.destroyOnStop();
+      card.goBack(true);
+    }
+    const component = Qt.createComponent("LunarLtk.Components", "CardItem");
+    for (const model of allCards) {
+      const card = component.createObject(roomScene, {
+        x: myPos.x + width,
+        y: myPos.y,
+        dataModel: model,
+      });
+      add(card);
+    }
+
+    updateCardPosition(true);
+  }
+
+  function applyChange(uiUpdate) {
+    sortable = Ltk.canSortHandcards(Cpp.self.id);
+
+    syncCards();
   }
 }

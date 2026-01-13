@@ -711,7 +711,7 @@ callbacks["LoseSkill"] = (sender, data) => {
   // jsonData: [ int player_id, string skill_name ]
   const [ id, skill_name, prelight ] = data;
   if (id === Cpp.self.id) {
-    dashboard.loseSkill(skill_name, prelight);
+    dashboard.skillArea.loseSkill(skill_name, prelight);
   }
 }
 
@@ -719,7 +719,7 @@ callbacks["AddSkill"] = (sender, data) => {
   // jsonData: [ int player_id, string skill_name ]
   const [ id, skill_name, prelight ] = data;
   if (id === Cpp.self.id) {
-    dashboard.addSkill(skill_name, prelight);
+    dashboard.skillArea.addSkill(skill_name, prelight);
   }
 }
 

@@ -84,7 +84,6 @@ W.PageBase {
 
           dashboard.disableAllCards();
           dashboard.disableSkills();
-          dashboard.pending_skill = "";
 
           for (const model of photoModel) {
             model.state = "normal";
@@ -222,7 +221,6 @@ W.PageBase {
         id: revertSelectionBtn
         text: Lua.tr("Revert Selection")
         textFont.pixelSize: 28
-        enabled: dashboard.pending_skill !== ""
         onClicked: Ltk.revertSelection();
       }
       MetroButton {
@@ -693,10 +691,10 @@ W.PageBase {
     dashboard.applyChange(uiUpdate);
     const pdatas = uiUpdate["Photo"];
     pdatas?.forEach(pdata => {
-      const photo = dataModel.getPhoto(pdata.id);
-      photo.state = pdata.state;
-      photo.selectable = pdata.enabled;
-      photo.selected = pdata.selected;
+      const model = dataModel.getPhoto(pdata.id);
+      model.state = pdata.state;
+      model.selectable = pdata.enabled;
+      model.selected = pdata.selected;
     });
     for (const model of photoModel) {
       model.updateTargetTip();

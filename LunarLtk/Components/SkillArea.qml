@@ -7,6 +7,8 @@ import LunarLtk
 
 Flickable {
   id: root
+
+  required property DashboardModel dataModel
   property alias skill_buttons: skill_buttons
   property alias prelight_buttons: prelight_buttons
   property alias not_active_buttons: not_active_buttons

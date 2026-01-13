@@ -36,8 +36,6 @@ Game.PokerCard {
 
   property bool markVisible: false
 
-  property string prohibitReason: ""
-
   hoverHandler.cursorShape: selectable ? Qt.PointingHandCursor : Qt.ArrowCursor
 
   property bool showDetail: true
@@ -132,6 +130,6 @@ Game.PokerCard {
     wrapMode: Text.WrapAnywhere
     style: Text.Outline
     styleColor: "red"
-    text: root.prohibitReason
+    text: root.dataModel.prohibitReason
   }
 }

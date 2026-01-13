@@ -1,11 +1,15 @@
 import QtQuick
 import Fk
-import LunarLtk.Components
+import LunarLtk
 
 QtObject {
   id: root
 
   property list<CardModel> handcards: [];
+  property list<CardModel> expandedCards: [];
+
+  property list<SkillModel> skills: [];
+  property list<SkillModel> fakeSkills: [];
 
   signal handcardsSorted()
 
@@ -54,5 +58,46 @@ QtObject {
     }
 
     handcardsSorted();
+  }
+
+  function changeSelf() {
+    const self = Lua.selfPlayer;
+    const ids = self.getCardIds("h");
+    handcards = ids.map(id => Ltk.createCardModel(id, { known: self.cardVisible(cid) }));
+    expandedCards = [];
+  }
+
+  function applyChange(uiUpdate) {
+    uiUpdate["CardItem"]?.forEach(cdata => {
+      const card = handcards.find(e => e.cardId === cdata.id) ||
+        expandedCards.find(e => e.cardId === cdata.id);
+
+      if (card) {
+        card.selectable = cdata.enabled;
+        card.selected = cdata.selected;
+      }
+    });
+
+    uiUpdate["_delete"]?.forEach(data => {
+      if (data.type !== "CardItem") return;
+      const idx = expandedCards.findIndex(e => e.cardId === data.id);
+      if (idx !== -1) expandedCards.splice(idx, 1);
+    });
+
+    uiUpdate["_new"]?.forEach(dat => {
+      if (dat.type !== "CardItem") return;
+      const card = Ltk.createCardModel(dat.data.id);
+      card.footnote = Lua.tr(dat.ui_data.footnote);
+      card.footnoteVisible = true;
+      const vcard = Ltk.getVirtualEquipData(0, dat.data.id);
+      if (vcard) card.virtName = vcard.name;
+      expandedCards.push(card);
+    });
+
+    for (const card of handcards) {
+      if (!card.selectable) {
+        card.prohibitReason = Ltk.getCardProhibitReason(card.cardId);
+      }
+    }
   }
 }

@@ -31,6 +31,10 @@ QtObject {
   property string footnote: ""  // footnote, e.g. "A use card to B"
   property bool footnoteVisible: false
 
+  property string prohibitReason: ""
+
   // 与UI交互相关
+  property bool selectable: false
+  property bool selected: false // 这个反过来被绑定
 }
 
