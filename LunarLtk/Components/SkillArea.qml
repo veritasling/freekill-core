@@ -21,16 +21,15 @@ Flickable {
   height: Math.min(200, panel.height)
   flickableDirection: Flickable.AutoFlickIfNeeded
 
-  ListModel {
-    id: prelight_skills
-  }
+  property list<SkillModel> activeSkills: [];
+  property list<SkillModel> nonactiveSkills: [];
 
-  ListModel {
-    id: active_skills
-  }
-
-  ListModel {
-    id: not_active_skills
+  Connections {
+    target: root.dataModel
+    function onSkillsChanged() {
+      root.activeSkills = root.dataModel.skills.filter(e => e.isActive);
+      root.nonactiveSkills = root.dataModel.skills.filter(e => !e.isActive);
+    }
   }
 
   Item {
@@ -45,21 +44,20 @@ Flickable {
       rowSpacing: 2
       Repeater {
         id: prelight_buttons
-        model: prelight_skills
+        model: root.dataModel.fakeSkills
         onItemAdded: parent.forceLayout()
         SkillButton {
-          skill: model.skill
-          type: "prelight"
+          required property SkillModel modelData
           enabled: !Config.observing
-          orig: model.orig_skill
+          dataModel: modelData
 
-          onPressedChanged: {
-            if (!pressed) return;
-            enabled = false;
-            ClientInstance.notifyServer("PushRequest", [
-              "prelight", orig, (!prelighted).toString()
-            ].join(","));
-          }
+          // onPressedChanged: {
+          //   if (!pressed) return;
+          //   enabled = false;
+          //   ClientInstance.notifyServer("PushRequest", [
+          //     "prelight", orig, (!prelighted).toString()
+          //   ].join(","));
+          // }
         }
       }
     }
@@ -72,25 +70,17 @@ Flickable {
       rowSpacing: 2
       Repeater {
         id: skill_buttons
-        model: active_skills
+        model: root.activeSkills
         onItemAdded: parent.forceLayout()
         SkillButton {
-          skill: model.skill
-          type: "active"
+          required property SkillModel modelData
           enabled: false
-          orig: model.orig_skill
+          dataModel: modelData
 
-          onPressedChanged: {
-            if (enabled)
-              roomScene.activateSkill(orig, pressed, "click");
-          }
-
-          onDoubleTappedChanged: {
-            if (doubleTapped && enabled) {
-              roomScene.activateSkill(orig, true, "doubleClick");
-              doubleTapped = false;
-            }
-          }
+          // onPressedChanged: {
+          //   if (enabled)
+          //     roomScene.activateSkill(orig, pressed, "click");
+          // }
         }
       }
     }
@@ -104,71 +94,17 @@ Flickable {
       rowSpacing: 2
       Repeater {
         id: not_active_buttons
-        model: not_active_skills
+        model: root.nonactiveSkills
         onItemAdded: parent.forceLayout()
         SkillButton {
-          skill: model.skill
-          orig: model.orig_skill
-          type: "notactive"
+          required property SkillModel modelData
+          enabled: false
+          dataModel: modelData
         }
       }
     }
   }
 
-  function addSkill(skill_name, prelight) {
-    const modelContains = (m, e) => {
-      for (let i = 0; i < m.count; i++) {
-        if (m.get(i).orig_skill === e.orig_skill) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    const data = Ltk.getSkillData(skill_name);
-
-    if (prelight) {
-      if (!modelContains(prelight_skills, data))
-        prelight_skills.append(data);
-      return;
-    }
-
-    if (data.freq === "active") {
-      if (!modelContains(active_skills, data)) active_skills.append(data);
-    } else {
-      if (!modelContains(not_active_skills, data))
-        not_active_skills.append(data);
-    }
-  }
-
-  function loseSkill(skill_name, prelight) {
-    if (prelight) {
-      for (let i = 0; i < prelight_skills.count; i++) {
-        const item = prelight_skills.get(i);
-        if (item.orig_skill == skill_name) {
-          prelight_skills.remove(i);
-        }
-      }
-      return;
-    }
-
-    for (let i = 0; i < active_skills.count; i++) {
-      const item = active_skills.get(i);
-      if (item.orig_skill == skill_name) {
-        active_skills.remove(i);
-      }
-    }
-    for (let i = 0; i < not_active_skills.count; i++) {
-      const item = not_active_skills.get(i);
-      if (item.orig_skill == skill_name) {
-        not_active_skills.remove(i);
-      }
-    }
-  }
-
-  function clearSkills() {
-    prelight_skills.clear();
-    active_skills.clear();
-    not_active_skills.clear();
+  function syncSkills() {
   }
 }

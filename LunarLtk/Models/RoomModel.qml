@@ -70,6 +70,8 @@ QtObject {
     for (const model of players) {
       model.refreshData();
     }
+
+    dashboard.refreshData();
   }
 
   function arrangeSeats(_, order) {
@@ -184,6 +186,39 @@ QtObject {
     });
   }
 
+  function changeSelf() {
+    // move new selfPhoto to dashboard
+    let order = new Array(players.length);
+    for (const model of players) {
+      order[model.seatNumber - 1] = model.playerid;
+    }
+    arrangeSeats(null, order);
+
+    // update dashboard
+    dashboard.changeSelf();
+  }
+
+  function loseSkill(sender, data) {
+    // jsonData: [ int player_id, string skill_name ]
+    const [ id, skill_name, prelight ] = data;
+    if (id === Cpp.self.id) {
+      dashboard.loseSkill(skill_name, prelight);
+    }
+  }
+
+  function addSkill(sender, data) {
+    // jsonData: [ int player_id, string skill_name ]
+    const [ id, skill_name, prelight ] = data;
+    if (id === Cpp.self.id) {
+      dashboard.addSkill(skill_name, prelight);
+    }
+  }
+
+  function prelightSkill(sender, data) {
+    const [ skill_name, prelight ] = data;
+    dashboard.prelightSkill(skill_name, prelight);
+  }
+
   // 确定只会修改model属性的逻辑都搬家到这里
   function setupCallbacks() {
     roomPage.addCallback(Command.ArrangeSeats, arrangeSeats);
@@ -197,6 +232,10 @@ QtObject {
     });
     roomPage.addCallback(Command.SetCardFootnote, setCardFootnote);
     roomPage.addCallback(Command.SetCardVirtName, setCardVirtName);
+    roomPage.addCallback(Command.ChangeSelf, changeSelf);
+    roomPage.addCallback(Command.LoseSkill, loseSkill);
+    roomPage.addCallback(Command.AddSkill, addSkill);
+    roomPage.addCallback(Command.PrelightSkill, prelightSkill);
     roomPage.addCallback("AddNpc", addNpc);
   }
 

@@ -830,9 +830,6 @@ W.PageBase {
     addCallback(Command.AskForMoveCardInBoard, Logic.callbacks["AskForMoveCardInBoard"]);
     addCallback(Command.AskForCardsAndChoice, Logic.callbacks["AskForCardsAndChoice"]);
     addCallback(Command.PlayCard, Logic.callbacks["PlayCard"]);
-    addCallback(Command.LoseSkill, Logic.callbacks["LoseSkill"]);
-    addCallback(Command.AddSkill, Logic.callbacks["AddSkill"]);
-    addCallback(Command.PrelightSkill, Logic.callbacks["PrelightSkill"]);
     addCallback(Command.AskForUseActiveSkill, Logic.callbacks["AskForUseActiveSkill"]);
     addCallback(Command.CancelRequest, Logic.callbacks["CancelRequest"]);
     addCallback(Command.AskForUseCard, Logic.callbacks["AskForUseCard"]);
@@ -848,7 +845,6 @@ W.PageBase {
     addCallback(Command.MiniGame, Logic.callbacks["MiniGame"]);
     addCallback(Command.UpdateMiniGame, Logic.callbacks["UpdateMiniGame"]);
     addCallback(Command.EmptyRequest, Logic.callbacks["EmptyRequest"]);
-    addCallback(Command.ChangeSelf, Logic.callbacks["ChangeSelf"]);
     addCallback(Command.UpdateRequestUI, Logic.callbacks["UpdateRequestUI"]);
     addCallback(Command.GetPlayerHandcards, Logic.callbacks["GetPlayerHandcards"]);
     addCallback(Command.ReplyToServer, Logic.callbacks["ReplyToServer"]);

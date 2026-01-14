@@ -280,14 +280,14 @@ function doIndicate(from, tos) {
 }
 
 callbacks["UpdateHandcard"] = (sender) => {
-  roomScene.dashboard.handcardArea.cards.forEach((v) => {
-    const id = v.cid;
-    if (Lua.evaluate(`ClientInstance:getCardArea(${id}) == Card.PlayerHand and ClientInstance:getCardOwner(${id}) == Self`)) {
-      v.setData(Ltk.getCardData(id, true));
-      v.known = Lua.selfPlayer.cardVisible(id);
-      v.draggable = true;
-    }
-  });
+  // roomScene.dashboard.handcardArea.cards.forEach((v) => {
+  //   const id = v.cid;
+  //   if (Lua.evaluate(`ClientInstance:getCardArea(${id}) == Card.PlayerHand and ClientInstance:getCardOwner(${id}) == Self`)) {
+  //     v.setData(Ltk.getCardData(id, true));
+  //     v.known = Lua.selfPlayer.cardVisible(id);
+  //     v.draggable = true;
+  //   }
+  // });
 }
 
 callbacks["UpdateCard"] = (sender, j) => {
@@ -319,19 +319,7 @@ callbacks["UpdateCard"] = (sender, j) => {
 }
 
 callbacks["UpdateSkill"] = (sender, j) => {
-  const sortable = Ltk.canSortHandcards(Cpp.self.id);
-  dashboard.sortable = sortable;
-  dashboard.handcardArea.sortable = sortable;
-  const all_skills = [roomScene.dashboard.skillButtons, roomScene.dashboard.notActiveButtons];
-  for (const skills of all_skills) {
-    for (let i = 0; i < skills.count; i++) {
-      const item = skills.itemAt(i);
-      const p = Lua.selfPlayer;
-      const skill = Ltk.getSkill(item.orig);
-      item.locked = !skill.isEffectable(p);
-      item.times = skill.getTimes(p);
-    }
-  }
+  // TODO 删了
 }
 
 function cancelAllFocus() {
@@ -707,28 +695,6 @@ callbacks["PlayCard"] = () => {
   roomScene.okCancel.visible = true;
 }
 
-callbacks["LoseSkill"] = (sender, data) => {
-  // jsonData: [ int player_id, string skill_name ]
-  const [ id, skill_name, prelight ] = data;
-  if (id === Cpp.self.id) {
-    dashboard.skillArea.loseSkill(skill_name, prelight);
-  }
-}
-
-callbacks["AddSkill"] = (sender, data) => {
-  // jsonData: [ int player_id, string skill_name ]
-  const [ id, skill_name, prelight ] = data;
-  if (id === Cpp.self.id) {
-    dashboard.skillArea.addSkill(skill_name, prelight);
-  }
-}
-
-callbacks["PrelightSkill"] = (sender, data) => {
-  const [ skill_name, prelight ] = data;
-
-  dashboard.prelightSkill(skill_name, prelight);
-}
-
 callbacks["AskForUseActiveSkill"] = (sender, data) => {
   // jsonData: string skill_name, string prompt
   const [ skill_name, prompt, cancelable ] = data;
@@ -987,19 +953,6 @@ callbacks["ChangeSkin"] = (sender, data) => {
     photo.deputySkinSource = deputypath === "-" ? "" : (AppPath + "/" + deputypath);
   }
   photo.changeSkinTimer.start()
-}
-
-// 神貂蝉
-callbacks["ChangeSelf"] = (sender, j) => {
-  // move new selfPhoto to dashboard
-  let order = new Array(photoModel.length);
-  for (const model of photoModel) {
-    order[model.seatNumber - 1] = model.playerid;
-  }
-  dataModel.arrangeSeats(null, order);
-
-  // update dashboard
-  dashboard.update();
 }
 
 callbacks["UpdateRequestUI"] = (sender, uiUpdate) => {

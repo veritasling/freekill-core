@@ -89,28 +89,10 @@ RowLayout {
 
   function update() {
     handcardAreaItem.unselectAll();
-
-    skillArea.clearSkills();
-    const self = Lua.selfPlayer;
-    for (const s of self.player_skills) {
-      addSkill(s.name);
-    }
   }
 
   function applyChange(uiUpdate) {
     dataModel.applyChange(uiUpdate);
     handcardAreaItem.applyChange(uiUpdate);
-
-    // skillBtn - SkillArea
-    uiUpdate["SkillButton"]?.forEach(skdata => {
-      for (let i = 0; i < skillButtons.count; i++) {
-        const skillBtn = skillButtons.itemAt(i);
-        if (skillBtn.orig == skdata.id) {
-          skillBtn.enabled = skdata.enabled;
-          skillBtn.pressed = skdata.selected;
-          break;
-        }
-      }
-    });
   }
 }

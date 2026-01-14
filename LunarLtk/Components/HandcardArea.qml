@@ -49,7 +49,7 @@ Item {
     card.autoBack = true;
     // 只有会被频繁刷新的手牌才能拖动
     // card.draggable = Ltk.canSortHandcards(Cpp.self.id);
-    card.selectable = false;
+    card.dataModel.selectable = false;
     card.clicked.connect(selectCard);
     card.clicked.connect(adjustCards);
     // card.doubleClicked.connect(doubleClickCard);
@@ -59,11 +59,9 @@ Item {
 
   function remove(outputs) {
     const result = cardArea.remove(outputs);
-    let card;
-    for (let i = 0; i < result.length; i++) {
-      card = result[i];
+    for (const card of result) {
       card.draggable = false;
-      card.selectable = false;
+      card.dataModel.selectable = false;
       card.clicked.disconnect(selectCard);
       card.selectedChanged.disconnect(adjustCards);
       // card.doubleClicked.disconnect(doubleClickCard);
@@ -214,8 +212,8 @@ Item {
   function enableCards(cardIds) {
     let card, i;
     cards.forEach(card => {
-      card.selectable = cardIds.includes(card.cid);
-      if (!card.selectable) {
+      card.dataModel.selectable = cardIds.includes(card.cid);
+      if (!card.dataModel.selectable) {
         card.selected = false;
       }
     });
@@ -233,32 +231,38 @@ Item {
   function syncCards() {
     // sync expandedCards
     const allCards = [...dataModel.handcards, ...dataModel.expandedCards];
+    const orderedCards = [];
     const extractedCards = [];
     for (const card of cards) {
       const idx = allCards.findIndex(e => e === card.dataModel);
       if (idx !== -1) {
-        allCards.splice(idx, 1);
+        orderedCards[idx] = card;
       } else {
         extractedCards.push(card.dataModel);
       }
     }
 
     const myPos = roomScene.mapFromItem(root, 0, 0);
-    for (const card in remove(extractedCards)) {
+    for (const card of remove(extractedCards)) {
       cards.splice(cards.indexOf(card), 1);
       card.origX = myPos.x + width;
       card.origY = myPos.y;
       card.destroyOnStop();
       card.goBack(true);
     }
+
+    cards = orderedCards;
     const component = Qt.createComponent("LunarLtk.Components", "CardItem");
     for (const model of allCards) {
+      if (cards.find(e => e.dataModel === model)) continue;
       const card = component.createObject(roomScene, {
         x: myPos.x + width,
         y: myPos.y,
         dataModel: model,
       });
+      const selectable = model.selectable;
       add(card);
+      model.selectable = selectable;
     }
 
     updateCardPosition(true);

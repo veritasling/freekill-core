@@ -60,24 +60,48 @@ QtObject {
     handcardsSorted();
   }
 
+  function addSkill(skill_name, prelight) {
+    const model = Ltk.createSkillModel(skill_name);
+    const arr = prelight ? fakeSkills : skills;
+
+    if (!arr.find(e => e.origName === skill_name)) {
+      arr.push(model);
+    }
+    return;
+  }
+
+  function loseSkill(skill_name, prelight) {
+    const arr = prelight ? fakeSkills : skills;
+    const idx = arr.findIndex(e => e.origName === skill_name);
+    if (idx !== -1) arr.splice(idx, 1);
+  }
+
   function changeSelf() {
     const self = Lua.selfPlayer;
     const ids = self.getCardIds("h");
     handcards = ids.map(id => Ltk.createCardModel(id, { known: self.cardVisible(cid) }));
     expandedCards = [];
+
+    skills = [];
+    fakeSkills = [];
+    for (const s of self.player_skills) {
+      addSkill(s.name);
+    }
+  }
+
+  function refreshData() {
+    // const sortable = Ltk.canSortHandcards(Cpp.self.id);
+    // dashboard.sortable = sortable;
+    // dashboard.handcardArea.sortable = sortable;
+    const p = Lua.selfPlayer;
+    for (const model of skills) {
+      const skill = Ltk.getSkill(model.origName);
+      model.nullified = !skill.isEffectable(p);
+      model.times = skill.getTimes(p);
+    }
   }
 
   function applyChange(uiUpdate) {
-    uiUpdate["CardItem"]?.forEach(cdata => {
-      const card = handcards.find(e => e.cardId === cdata.id) ||
-        expandedCards.find(e => e.cardId === cdata.id);
-
-      if (card) {
-        card.selectable = cdata.enabled;
-        card.selected = cdata.selected;
-      }
-    });
-
     uiUpdate["_delete"]?.forEach(data => {
       if (data.type !== "CardItem") return;
       const idx = expandedCards.findIndex(e => e.cardId === data.id);
@@ -94,10 +118,28 @@ QtObject {
       expandedCards.push(card);
     });
 
+    uiUpdate["CardItem"]?.forEach(cdata => {
+      const card = handcards.find(e => e.cardId === cdata.id) ||
+        expandedCards.find(e => e.cardId === cdata.id);
+
+      if (card) {
+        card.selectable = cdata.enabled;
+        card.selected = cdata.selected;
+      }
+    });
+
     for (const card of handcards) {
       if (!card.selectable) {
         card.prohibitReason = Ltk.getCardProhibitReason(card.cardId);
       }
     }
+
+    uiUpdate["SkillButton"]?.forEach(skdata => {
+      const skillBtn = skills.find(e => e.origName === skdata.id);
+      if (skillBtn) {
+        skillBtn.enabled = skdata.enabled;
+        skillBtn.selected = skdata.selected;
+      }
+    });
   }
 }

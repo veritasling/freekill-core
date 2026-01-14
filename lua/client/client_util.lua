@@ -403,7 +403,6 @@ function GetSkillData(skill_name)
     freq = freq,
     frequency = frequency,
     switchSkillName = (skill:hasTag(Skill.Switch) or skill:hasTag(Skill.Rhyme)) and skill:getSkeleton().name or "",
-    isViewAsSkill = skill:isInstanceOf(ViewAsSkill),
   }
 end
 
@@ -1148,9 +1147,6 @@ function RefreshStatusSkills()
 
   -- 刷自己的手牌
   self:notifyUI("UpdateHandcard")
-
-  -- 刷技能状态
-  self:notifyUI("UpdateSkill", nil)
 end
 
 function GetPlayersAndObservers()

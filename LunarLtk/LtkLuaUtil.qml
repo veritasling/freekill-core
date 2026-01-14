@@ -435,4 +435,18 @@ QtObject {
     if (additionalProp instanceof Object) Object.assign(prop, additionalProp);
     return component.createObject(null, prop);
   }
+
+  function createSkillModel(skillName, additionalProp) {
+    const component = Qt.createComponent("LunarLtk.Models", "SkillModel");
+    const data = Ltk.getSkillData(skillName);
+    // 有品 赶紧杀了getSkillData罢
+    const prop = {
+      name: data.skill,
+      origName: data.orig_skill,
+      isActive: data.freq === "active",
+      frequency: data.frequency ?? "",
+      extension: data.extension,
+    };
+    return component.createObject(null, prop);
+  }
 }

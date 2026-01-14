@@ -34,6 +34,9 @@ Game.PokerCard {
   footnoteVisible: dataModel.footnoteVisible
   known: dataModel.known
 
+  selectable: dataModel.selectable
+  onSelectedChanged: dataModel.selected = selected;
+
   property bool markVisible: false
 
   hoverHandler.cursorShape: selectable ? Qt.PointingHandCursor : Qt.ArrowCursor
