@@ -66,6 +66,19 @@ QtObject {
 
     if (!arr.find(e => e.origName === skill_name)) {
       arr.push(model);
+      if (arr === fakeSkills) {
+        model.selectedChanged.connect(() => {
+          if (!model.selected) return;
+          model.enabled = false;
+          ClientInstance.notifyServer("PushRequest", [
+            "prelight", model.origName, (!model.prelighted).toString()
+          ].join(","));
+        });
+      } else {
+        model.selectedChanged.connect(() => {
+          if (model.enabled) roomScene.activateSkill(model.origName, model.selected, "click");
+        });
+      }
     }
     return;
   }
@@ -74,6 +87,12 @@ QtObject {
     const arr = prelight ? fakeSkills : skills;
     const idx = arr.findIndex(e => e.origName === skill_name);
     if (idx !== -1) arr.splice(idx, 1);
+  }
+
+  function disableAllSkills() {
+    for (const model of skills) {
+      model.enabled = false;
+    }
   }
 
   function changeSelf() {

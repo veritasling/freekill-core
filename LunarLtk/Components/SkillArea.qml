@@ -48,16 +48,7 @@ Flickable {
         onItemAdded: parent.forceLayout()
         SkillButton {
           required property SkillModel modelData
-          enabled: !Config.observing
           dataModel: modelData
-
-          // onPressedChanged: {
-          //   if (!pressed) return;
-          //   enabled = false;
-          //   ClientInstance.notifyServer("PushRequest", [
-          //     "prelight", orig, (!prelighted).toString()
-          //   ].join(","));
-          // }
         }
       }
     }
@@ -74,13 +65,7 @@ Flickable {
         onItemAdded: parent.forceLayout()
         SkillButton {
           required property SkillModel modelData
-          enabled: false
           dataModel: modelData
-
-          // onPressedChanged: {
-          //   if (enabled)
-          //     roomScene.activateSkill(orig, pressed, "click");
-          // }
         }
       }
     }
@@ -98,7 +83,6 @@ Flickable {
         onItemAdded: parent.forceLayout()
         SkillButton {
           required property SkillModel modelData
-          enabled: false
           dataModel: modelData
         }
       }

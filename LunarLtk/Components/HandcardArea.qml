@@ -19,8 +19,6 @@ Item {
   property var draggingCard
   property var draggingClickedPhoto
 
-  signal cardSelected(int cardId, bool selected)
-
   Connections {
     target: root.dataModel
     function onHandcardsSorted() {
@@ -32,6 +30,10 @@ Item {
     id: cardArea
     anchors.fill: parent
     onLengthChanged: root.updateCardPosition(true);
+  }
+
+  function cardSelected(cardId, selected) {
+    Ltk.updateRequestUI("CardItem", cardId, "click", { selected, autoTarget: Config.autoTarget } );
   }
 
   function add(inputs) {

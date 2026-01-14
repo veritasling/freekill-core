@@ -11,6 +11,7 @@ QtObject {
 
   property int cardId   // 游戏牌的id
   property int virtId   // 若cardId为0（虚拟卡），则另设id以便与ui卡一一对应
+  property var cardItem
 
   property string name: "slash" // 牌名
   property string virtName: "" // 被〖武神〗之类技能强制转化，或被当作其他牌使用时，此牌的实际牌名

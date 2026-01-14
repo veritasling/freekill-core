@@ -83,7 +83,7 @@ W.PageBase {
           extra_data = {};
 
           dashboard.disableAllCards();
-          dashboard.disableSkills();
+          dataModel.dashboard.disableAllSkills();
 
           for (const model of photoModel) {
             model.state = "normal";
@@ -147,10 +147,7 @@ W.PageBase {
         dataModel: modelData
 
         onRightClicked: {
-          if (playerid === 0 || playerid === -1) {
-            return;
-          }
-
+          if (playerid === 0 || playerid === -1) return;
           roomScene.startCheat("PlayerDetail", { photo: this });
         }
 

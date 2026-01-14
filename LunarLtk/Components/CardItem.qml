@@ -26,6 +26,7 @@ Game.PokerCard {
   height: 130 * cardScale
 
   required property CardModel dataModel
+  onDataModelChanged: dataModel.cardItem = root;
 
   suit: dataModel.suit
   number: dataModel.number
@@ -36,6 +37,15 @@ Game.PokerCard {
 
   selectable: dataModel.selectable
   onSelectedChanged: dataModel.selected = selected;
+
+  Connections {
+    target: root.dataModel
+    function onSelectedChanged() {
+      if (root.selected !== root.dataModel.selected) {
+        root.selected = root.dataModel.selected;
+      }
+    }
+  }
 
   property bool markVisible: false
 

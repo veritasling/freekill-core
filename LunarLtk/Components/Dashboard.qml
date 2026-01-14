@@ -13,9 +13,6 @@ RowLayout {
 
   property alias handcardArea: handcardAreaItem
   property alias sortable: handcardAreaItem.sortable
-  property alias skillArea: skillArea
-  property alias skillButtons: skillArea.skill_buttons
-  property alias notActiveButtons: skillArea.not_active_buttons
 
   signal cardSelected(var card)
 
@@ -53,31 +50,19 @@ RowLayout {
     Layout.rightMargin: -175 / 8 + (roomArea.width - 175 * 0.75 * 7) / 8
   }
 
-  Connections {
-    target: handcardAreaItem
-    function onCardSelected(cardId, selected) {
-      Ltk.updateRequestUI("CardItem", cardId, "click", { selected, autoTarget: Config.autoTarget } );
-    }
-  }
-
   function disableAllCards() {
     handcardAreaItem.enableCards([]);
   }
 
   function prelightSkill(skill_name, prelight) {
-    const btns = skillArea.prelight_buttons;
-    for (let i = 0; i < btns.count; i++) {
-      const btn = btns.itemAt(i);
-      if (btn.orig === skill_name) {
-        btn.prelighted = prelight;
-        btn.enabled = true;
-      }
-    }
-  }
-
-  function disableSkills() {
-    for (let i = 0; i < skillButtons.count; i++)
-      skillButtons.itemAt(i).enabled = false;
+    // const btns = skillArea.prelight_buttons;
+    // for (let i = 0; i < btns.count; i++) {
+    //   const btn = btns.itemAt(i);
+    //   if (btn.orig === skill_name) {
+    //     btn.prelighted = prelight;
+    //     btn.enabled = true;
+    //   }
+    // }
   }
 
   function updateHandcards() {
@@ -85,10 +70,6 @@ RowLayout {
     handcardAreaItem.cards.forEach(v => {
       v.setData(Ltk.getCardData(v.cid, true));
     });
-  }
-
-  function update() {
-    handcardAreaItem.unselectAll();
   }
 
   function applyChange(uiUpdate) {

@@ -66,11 +66,16 @@ QtObject {
   // 与UI交互相关
   property string state: "normal" // normal - 正常 candidate - 待选
   property bool selectable: false
-  property bool selected: false // 这个反过来被绑定
+  property bool selected: false
 
   onSelectedChanged: {
     if (state !== "candidate") return;
-    Ltk.updateRequestUI("Photo", playerid, "click", { selected, autoTarget: Config.autoTarget } );
+    if (photoItem.selected !== selected) {
+      // 因为selected被绑定到ui组件的selected同时也会被逻辑影响，此处是手动刷UI
+      photoItem.selected = selected;
+    } else {
+      Ltk.updateRequestUI("Photo", playerid, "click", { selected, autoTarget: Config.autoTarget } );
+    }
   }
 
   function updateHandcards() {
