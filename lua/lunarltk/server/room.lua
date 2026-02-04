@@ -2327,7 +2327,7 @@ function Room:askToPlayCard(player, params)
   for _, cid in ipairs(cards) do
     local card = Fk:getCardById(cid)
     if not (Exppattern:Parse(pattern):match(card) and
-      card.skill:canUse(player, card, extra_data) and
+      card:getSkill(player):canUse(player, card, extra_data) and
       not player:prohibitUse(card)) then
       table.insert(cardIds, cid)
     end

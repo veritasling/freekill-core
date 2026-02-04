@@ -33,4 +33,12 @@ function FilterSkill:handlyCardsFilter(player)
   return {}
 end
 
+--将此牌的技能改为另一技能
+---@param card Card @ 之前的牌
+---@param player Player
+---@return string
+function FilterSkill:cardSkillFilter(card, player)
+  return nil
+end
+
 return FilterSkill

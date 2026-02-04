@@ -16,6 +16,7 @@ JudgeData = TriggerData:subclass("JudgeData")
 function JudgeData:initialize(spec)
   TriggerData.initialize(self, spec)
   self.pattern = spec.pattern or "."
+  self:initializePattern()
   spec.matchPattern = JudgeData.matchPattern
 end
 
@@ -52,29 +53,56 @@ function JudgeData:initializePattern()
   if type(self.pattern) == "string" then
     local pattern_str = self.pattern
     self.pattern = {
-      [pattern_str] = "good",
-      ["else"] = "bad",
+      [pattern_str] = {"good"},
+      ["else"] = {"bad"},
     }
+  else
+    local tmp = {}
+    for pattern, result in pairs(self.pattern) do
+      tmp[pattern] = type(result) == "table" and result or { result }
+    end
+    self.pattern = tmp
   end
 end
 
 -- 添加一条判定分支
+---@param pattern string @ 判定条件
+---@param result string|table @ 判定结果或结果列表
 function JudgeData:addPattern(pattern, result)
-  self:initializePattern()
-  self.pattern[pattern] = result
+  local ret = self.pattern[pattern]
+  if type(ret) == "table" then
+    table.insert(ret, result)
+  elseif ret then
+    ret = { ret, result } ---@diagnostic disable-line: cast-local-type
+  else
+    ret = result
+  end
+  self.pattern[pattern] = ret
 end
 
 -- 反转判定——good变bad，bad变good，其余不变
 function JudgeData:reversePattern()
-  self:initializePattern()
   local tmp = {}
   for pattern, result in pairs(self.pattern) do
-    if result == "good" then
-      tmp[pattern] = "bad"
-    elseif result == "bad" then
-      tmp[pattern] = "good"
+    tmp[pattern] = {}
+    if type(result) == "table" then
+      for _, res in ipairs(result) do
+        if res == "good" then
+          table.insert(tmp[pattern], "bad")
+        elseif res == "bad" then
+          table.insert(tmp[pattern], "good")
+        else
+          table.insert(tmp[pattern], res)
+        end
+      end
     else
-      tmp[pattern] = result
+      if result == "good" then
+        table.insert(tmp[pattern], "bad")
+      elseif result == "bad" then
+        table.insert(tmp[pattern], "good")
+      else
+        table.insert(tmp[pattern], result)
+      end
     end
   end
   self.pattern = tmp

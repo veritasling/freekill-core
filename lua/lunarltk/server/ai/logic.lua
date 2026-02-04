@@ -478,9 +478,9 @@ function UseCard:exec()
   if #useCardData.tos == 0 then
     local fix_targets = useCardData.card:getFixedTargets(useCardData.from, useCardData.extra_data)
     if fix_targets then
-      if useCardData.card.skill then
+      if useCardData.card:getSkill(useCardData.from) then
         for _, p in ipairs(fix_targets) do
-          if useCardData.card.skill:modTargetFilter(useCardData.from, p, {}, useCardData.card, useCardData.extra_data)
+          if useCardData.card:getSkill(useCardData.from):modTargetFilter(useCardData.from, p, {}, useCardData.card, useCardData.extra_data)
             and not useCardData.from:isProhibited(p, useCardData.card) then
             useCardData:addTarget(p)
           end
@@ -489,8 +489,8 @@ function UseCard:exec()
     end
   end
 
-  if useCardData and useCardData.card and useCardData.card.skill then
-    local skill_ai = self.ai:findStrategyOfSkill(Fk.Ltk.AI.CardSkillStrategy, useCardData.card.skill.name)
+  if useCardData and useCardData.card and useCardData.card:getSkill(useCardData.from) then
+    local skill_ai = self.ai:findStrategyOfSkill(Fk.Ltk.AI.CardSkillStrategy, useCardData.card:getSkill(useCardData.from).name)
     if skill_ai then skill_ai:onUse(logic, useCardData) end
   end
 

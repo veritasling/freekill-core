@@ -8,7 +8,7 @@
 ---@field public global? boolean @ 决定是否是全局技能
 ---@field public dynamic_desc? fun(self: Skill, player: Player, lang: string): string? @ 动态描述函数
 ---@field public derived_piles? string|string[]  @deprecated @ 与某效果联系起来的私人牌堆名，失去该效果时将之置入弃牌堆
----@field public audio_index? table|integer @ 此技能效果播放的语音序号，可为int或int表
+---@field public audio_index? table|integer @ 此技能效果播放的语音序号，可为int或int表，为0时不播放语音
 ---@field public extra? table @ 塞进技能里的各种数据
 
 ---@class SkillSkeletonSpec
@@ -30,7 +30,7 @@
 
 ---@class SkillSkeleton : Object, SkillSkeletonSpec
 ---@field public effects Skill[] @ 该技能对应的所有效果
----@field public effect_names string[] @ 该技能对应的效果名
+---@field public effect_names string[] @ 该技能的各效果在记录使用纪录中所使用的名字，其中主效果的格式为`#技能名_main_skill`. 其余效果格式为`#技能名_序号_效果类型`
 ---@field public effect_spec_list ([any, any, any])[] @ 该技能对应的效果信息
 ---@field public ai_strategies { [AIStrategy]: AIStrategy[] }
 ---@field public tests fun(room: Room, me: ServerPlayer)[]
@@ -239,6 +239,7 @@ end
 --- can_refresh?: T,
 --- can_wake?: T,
 --- global?: boolean,
+--- mute?: boolean,
 --- anim_type?: AnimationType,
 --- frequency?: string,
 --- is_delay_effect?: boolean,
@@ -463,6 +464,7 @@ function SkillSkeleton:createFilterSkill(_skill, idx, key, attr, spec)
   skill.viewAs = spec.view_as
   skill.equipSkillFilter = spec.equip_skill_filter
   skill.handlyCardsFilter = spec.handly_cards
+  skill.cardSkillFilter = spec.card_skill_filter
 
   return skill
 end

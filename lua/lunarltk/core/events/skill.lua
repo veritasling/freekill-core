@@ -6,6 +6,9 @@
 ---@field public cards integer[] @ 选择卡牌
 ---@field public cost_data? CostData|table @ 发动技能时的消耗数据，请使用event:setCostData(skill)指定
 ---@field public interaction_data? any @ 选项框获取的数据
+---@field public history_branch? string @ 技能发动历史分支
+---@field public trigger_event? TriggerEvent @ 当前触发时机的数据（仅用于触发技）
+---@field public switch_state? integer @ 技能发动前的阴阳状态（仅用于转换技）
 
 ---@class CostData
 ---@field public tos? ServerPlayer[] @ 技能指定的角色目标

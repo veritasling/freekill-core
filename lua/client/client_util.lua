@@ -854,7 +854,7 @@ function GetCardProhibitReason(cid)
     method = "discard"
   end
 
-  if method == "play" and not card.skill:canUse(Self, card) then return "" end
+  if method == "play" and not card:getSkill(Self):canUse(Self, card) then return "" end
   if method ~= "play" and not card:matchPattern(pattern) then return "" end
   if method == "play" then method = "use" end
 
@@ -943,7 +943,7 @@ function GetTargetTip(pid)
     end
 
     ret = ret or {}
-    local tip = card.skill:targetTip(Self, ClientInstance:getPlayerById(to_select),
+    local tip = card:getSkill(Self):targetTip(Self, ClientInstance:getPlayerById(to_select),
       table.map(selected, Util.Id2PlayerMapper), selected_cards, card, selectable, extra_data)
     if type(tip) == "string" then
       table.insert(ret, { content = tip, type = "normal" })

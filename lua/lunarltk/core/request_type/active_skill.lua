@@ -290,7 +290,7 @@ function ReqActiveSkill:feasible()
     ---@cast skill ViewAsSkill
     local card = skill:viewAs(player, self.pendings)
     if card then
-      ret = card.skill:feasible(player, targets, { card.id }, card)
+      ret = card:getSkill(player):feasible(player, targets, { card.id }, card)
     else
       ret = skill:feasible(player, targets, self.pendings)
     end
@@ -322,7 +322,7 @@ function ReqActiveSkill:targetValidity(pid)
     ---@cast skill ViewAsSkill
     card = skill:viewAs(self.player, self.pendings)
     if card then
-      skill = card.skill
+      skill = card:getSkill(self.player)
     end
   end
   local room = Fk:currentRoom()

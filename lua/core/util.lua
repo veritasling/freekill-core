@@ -259,7 +259,7 @@ Util.CanUseToSelf = function(self, player, card, extra_data)
   local tos = card:getFixedTargets(player, extra_data)
   return tos and table.find(tos, function(p)
     return not player:isProhibited(p, card)
-    and Util.CardTargetFilter(card.skill, player, p, {}, card.subcards, card, extra_data)
+    and Util.CardTargetFilter(card:getSkill(player), player, p, {}, card.subcards, card, extra_data)
   end) ~= nil
 end
 
@@ -298,7 +298,7 @@ Util.CanUseFixedTarget = function(self, player, card, extra_data)
   local tos = card:getFixedTargets(player, extra_data)
   return tos and table.find(tos, function(p)
     return not player:isProhibited(p, card)
-    and Util.CardTargetFilter(card.skill, player, p, {}, card.subcards, card, extra_data)
+    and Util.CardTargetFilter(card:getSkill(player), player, p, {}, card.subcards, card, extra_data)
   end) ~= nil
 end
 

@@ -79,7 +79,7 @@ function TriggerSkill:doCost(event, target, player, data)
   --self.cost_data = cost_data_bak
 
   if ret then -- 如果完成了消耗，则执行技能效果，并判断是否要终结此时机
-    local skill_data = {cost_data = cost_data_bak, tos = {}, cards = {}}
+    local skill_data = { cost_data = cost_data_bak, tos = {}, cards = {}, trigger_event = event }
     if cost_data_bak and type(cost_data_bak) == "table" then
       skill_data.tos = cost_data_bak.tos
       skill_data.cards = cost_data_bak.cards

@@ -138,10 +138,7 @@ function Player:__tocbor()
   return cbor.encode(cbor.tagged(CBOR_TAG_PLAYER, self.id))
 end
 function Player:__touistring()
-  if self.deputyGeneral == "" then
-    return Fk:translate(self.general)
-  end
-  return Fk:translate("seat#" .. self.seat)
+  return self:toLogString()
 end
 function Player:__toqml()
   return {
@@ -1233,7 +1230,7 @@ end
 ---@param card Card @ 特定牌
 ---@param extra_data? UseExtraData @ 额外数据
 function Player:canUse(card, extra_data)
-  return not self:prohibitUse(card) and not not card.skill:canUse(self, card, extra_data)
+  return not self:prohibitUse(card) and not not card:getSkill(self):canUse(self, card, extra_data)
 end
 
 --- 确认玩家是否可以对特定玩家使用特定牌。
@@ -1245,7 +1242,7 @@ function Player:canUseTo(card, to, extra_data)
   local _extra = extra_data and table.simpleClone(extra_data) or {}
   _extra.fix_targets = {to.id}
   local can_use = self:canUse(card, _extra) -- for judging peach canUse correctly
-  return can_use and Util.CardTargetFilter(card.skill, self, to, {}, card.subcards, card, _extra)
+  return can_use and Util.CardTargetFilter(card:getSkill(self), self, to, {}, card.subcards, card, _extra)
 end
 
 --- 确认玩家是否可以使用/打出特定牌，考虑Fk.currentResponsePattern。
@@ -1263,7 +1260,7 @@ function Player:canUseOrResponseInCurrent(card, extra_data)
         else
           extra_data = extra_data or handler.extra_data
           return not self:prohibitUse(card) and
-            ((card.is_passive and not (extra_data or {}).not_passive) or card.skill:canUse(self, card, extra_data))
+            ((card.is_passive and not (extra_data or {}).not_passive) or card:getSkill(self):canUse(self, card, extra_data))
         end
       end
       return true
@@ -1480,7 +1477,7 @@ fk.SwitchYin = 1
 ---@param skillName string @ 技能名
 ---@param afterUse? boolean @ 是否提前计算转换后状态
 ---@param inWord? boolean @ 是否返回文字
----@return number|string @ 转换技状态
+---@return integer | string @ 转换技状态
 function Player:getSwitchSkillState(skillName, afterUse, inWord)
   if afterUse then
     return self:getMark(MarkEnum.SwithSkillPreName .. skillName) < 1 and (inWord and "yin" or fk.SwitchYin) or (inWord and "yang" or fk.SwitchYang)
@@ -1852,6 +1849,25 @@ function Player:deserialize(o)
       room:setCardArea(id, Card.PlayerSpecial, pid)
     end
   end
+end
+
+-- for sendLog
+function Player:toLogString()
+  local function getTransName(p)
+    local ret = p.general
+    ret = Fk:translate(ret)
+    if p.deputyGeneral and p.deputyGeneral ~= "" then
+      ret = ret .. "/" .. Fk:translate(p.deputyGeneral)
+    end
+    return ret
+  end
+  local name = getTransName(self)
+  for _, p2 in ipairs(Fk:currentRoom().players) do
+    if p2 ~= self and getTransName(p2) == name then
+      return Fk:translate("seat#" .. self.seat)
+    end
+  end
+  return name
 end
 
 return Player

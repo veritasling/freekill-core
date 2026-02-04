@@ -27,7 +27,6 @@ function SkillEffect:main()
   local effect_cb, player, skill, skill_data = data.skill_cb, data.who, data.skill, data.skill_data
   local room = self.room
   local logic = room.logic
-  skill_data = skill_data or Util.DummyTable
   local cost_data = skill_data.cost_data or Util.DummyTable
 
   if player and not skill.cardSkill then
@@ -78,7 +77,9 @@ function SkillEffect:main()
         if type(audio_index) == "table" then
           audio_index = table.random(audio_index)
         end
-        player:broadcastSkillInvoke(skill:getSkeleton().name, audio_index)
+        if audio_index ~= 0 then
+          player:broadcastSkillInvoke(skill:getSkeleton().name, audio_index)
+        end
         room:notifySkillInvoked(player, skill.name, anim_type, no_indicate and {} or tos)
       end
     end
@@ -88,6 +89,7 @@ function SkillEffect:main()
 
     if skill:hasTag(Skill.Switch) and not skill.is_delay_effect then
       local switchSkillName = skill:getSkeleton().name ---@type string
+      data.skill_data.switch_state = player:getSwitchSkillState(switchSkillName)
       room:setPlayerMark(
         player,
         MarkEnum.SwithSkillPreName .. switchSkillName,
@@ -95,17 +97,17 @@ function SkillEffect:main()
       )
     end
 
-    local branch
     if type(cost_data) == "table" then
-      branch = cost_data.history_branch
-    end
-    if not branch then
-      if type(skill.history_branch) == "function" then
-        branch = skill:history_branch(player, skill_data)
-      else
-        branch = skill.history_branch
+      skill_data.history_branch = cost_data.history_branch
+    else
+      local branch = skill.history_branch
+      if type(branch) == "function" then
+        skill_data.history_branch = skill:history_branch(player, skill_data)
+      elseif type(branch) == "string" then
+        skill_data.history_branch = branch
       end
     end
+    local branch = skill_data.history_branch
 
     player:addSkillUseHistory(skill.name)
     if not skill.is_delay_effect then
@@ -127,7 +129,7 @@ function SkillEffect:main()
   logic:trigger(fk.SkillEffect, player, data)
   if not data.prevented then
     if effect_cb then
-      data.trigger_break = effect_cb()
+      data.trigger_break = not not effect_cb()
     end
   end
 
@@ -174,6 +176,8 @@ function SkillEventWrappers:useSkill(player, skill, effect_cb, skill_data)
         skill_data[k] = v
       end
     end
+  else
+    skill_data = { cards = {}, tos  = {}, from = player }
   end
   local data = SkillEffectData:new{
     who = player,

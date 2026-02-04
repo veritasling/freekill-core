@@ -77,21 +77,16 @@ function Judge:main()
     local results = data.results
     -- 对现有的string做分歧处理
     if not next(results) then
-      if type(data.pattern) == "table" then
-        for pattern, result in pairs(data.pattern) do
-          if data.card:matchPattern(pattern) then
-            table.insertIfNeed(results, result)
-          end
+      for pattern, result in pairs(data.pattern) do
+        if data.card:matchPattern(pattern) then
+          table.insertTableIfNeed(results,
+          type(result) == "table" and result or { result })
         end
-        if not next(results) then
-          table.insertIfNeed(results, data.pattern["else"])
-        end
-      else
-        if data.card:matchPattern(data.pattern) then
-          table.insertIfNeed(results, "good")
-        else
-          table.insertIfNeed(results, "bad")
-        end
+      end
+      if not next(results) then
+        local result = data.pattern["else"]
+        table.insertTableIfNeed(results,
+          type(result) == "table" and result or { result })
       end
     end
     if table.contains(results, "good") then

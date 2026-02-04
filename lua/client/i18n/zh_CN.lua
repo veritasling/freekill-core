@@ -209,11 +209,11 @@ Fk:loadTranslationTable {
 
 作者： Notify Ho-spair
 
-开发者： RalphR Nyutanislavsky xxyheaven 妖梦厨
+开发者：聆听 RalphR Nyutanislavsky xxyheaven 妖梦厨 喑黒毀灭емо公主 木易流离 水天一色
 
-贡献者： 假象 deepskybird 板蓝根 s1134s 喑黒毀灭емо公主 影月
+贡献者： 假象 deepskybird 板蓝根 s1134s 影月
 
-鸣谢： Mogara
+鸣谢： Mogara sumneko
 
   ]],
   ["about_qt_description"] = [[
@@ -348,7 +348,7 @@ FreeKill使用的是libgit2的C API，与此同时使用Git完成拓展包的下
 
   [" thinking..."] = " 思考中...",
   ["AskForGeneral"] = "选择武将",
-  ["AskForGuanxing"] = "观星",
+  ["AskForGuanxing"] = "观看牌堆",
   ["AskForExchange"] = "换牌",
   ["AskForChoice"] = "选择",
   ["AskForChoices"] = "选择",
@@ -594,6 +594,7 @@ Fk:loadTranslationTable {
   ["bigender"] = "双性",
   ["agender"] = "无性",
   ["MaxHp"] = "体力上限",
+  ["MaxCards"] = "手牌上限",
   ["Hp"] = "体力",
   ["Damage"] = "伤害",
   ["Lost"] = "失去",

@@ -205,6 +205,7 @@ end
 ---@field public view_as? fun(self: FilterSkill, player: Player, card: Card): Card?
 ---@field public equip_skill_filter? fun(self: FilterSkill, skill: Skill, player: Player): string?
 ---@field public handly_cards? fun(self: FilterSkill, player: Player): integer[]? @ 视为拥有可以如手牌般使用或打出的牌
+---@field public card_skill_filter? fun(self: FilterSkill, card: Card, player: Player): string?
 
 
 ---@class InvaliditySpec: StatusSkillSpec

@@ -841,4 +841,13 @@ function ServerPlayer:addQinggangTag(data)
   end
 end
 
+--- 当前转换技发动前的阴阳状态，用于转换触发技的on_use内
+---@return integer?
+function ServerPlayer:currentSwitchState()
+  local event = self.room.logic:getCurrentEvent()
+  if event.event == GameEvent.SkillEffect then
+    return event.data.skill_data.switch_state
+  end
+end
+
 return ServerPlayer

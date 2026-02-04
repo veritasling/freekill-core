@@ -198,6 +198,7 @@ W.PageBase {
       const suitTable = {
         spade: "♠", heart: '<font color="red">♥</font>',
         club: "♣", diamond: '<font color="red">♦</font>',
+        nosuit: "无花色",
       }
 
       if (!cards) {

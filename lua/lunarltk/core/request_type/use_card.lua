@@ -9,8 +9,8 @@ function ReqUseCard:updatePrompt()
     return ReqActiveSkill.updatePrompt(self)
   end
   local card = self.selected_card
-  if card and card.skill then
-    self:setSkillPrompt(card.skill, {card.id})
+  if card and card:getSkill(self.player) then
+    self:setSkillPrompt(card:getSkill(self.player), {card.id})
   else
     self:setPrompt(self.original_prompt or "")
   end
@@ -47,7 +47,7 @@ function ReqUseCard:targetValidity(pid)
       card = skill:viewAs(self.player, self.pendings)
       --不要在当前转化卡牌不可用的情况下开启选目标
       if card and self:cardFeasible(card) then
-        skill = card.skill
+        skill = card:getSkill(user)
         if self.extra_data and self.extra_data.fix_user then
           user = Fk:currentRoom():getPlayerById(self.extra_data.fix_user)
         end
@@ -65,7 +65,7 @@ function ReqUseCard:targetValidity(pid)
   if self.extra_data and self.extra_data.fix_user then
     user = Fk:currentRoom():getPlayerById(self.extra_data.fix_user)
   end
-  local ret = card and card.skill:targetFilter(user, p, selected, { card.id }, card, self.extra_data)
+  local ret = card and card:getSkill(user):targetFilter(user, p, selected, { card.id }, card, self.extra_data)
   return not not ret
 end
 
@@ -98,7 +98,7 @@ function ReqUseCard:feasible()
     if self.extra_data and self.extra_data.fix_user then
       user = Fk:currentRoom():getPlayerById(self.extra_data.fix_user)
     end
-    ret = card.skill:feasible(user, table.map(self.selected_targets, Util.Id2PlayerMapper),
+    ret = card:getSkill(user):feasible(user, table.map(self.selected_targets, Util.Id2PlayerMapper),
       skill and self.pendings or { card.id }, card)
   end
   return not not ret
@@ -129,7 +129,7 @@ function ReqUseCard:selectTarget(playerid, data)
   scene:update("Photo", playerid, data)
 
   if card then
-    local skill = card.skill
+    local skill = card:getSkill(player)
     if selected then
       table.insert(self.selected_targets, playerid)
     else
