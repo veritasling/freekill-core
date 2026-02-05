@@ -254,4 +254,72 @@ QtObject {
   function getAudioRealPath(name, extension, audiotype) {
     return searchPkgResourceWithExtension(extension, "/audio/" + audiotype + "/", name, ".mp3");
   }
+ // 获取武将动态皮肤文件（支持1=入场, 2=待机, 3=特殊）
+function getGeneralAnimationFiles(name) {
+  console.log("DEBUG: called with name =", name);
+  
+  // 默认返回值：确保无论出错与否都返回有效对象
+  const defaultResult = {
+    hasAnimation: false,
+    files: {},
+    types: {}
+  };
+  
+  // 空值检查
+  if (!name || name === "") return defaultResult;
+  
+  try {
+    const data = Lua.call("GetGeneralData", name);
+    if (!data || !data.extension) {
+      console.log("DEBUG: No data or extension for", name);
+      return defaultResult;
+    }
+    
+    const extension = data.extension;
+    console.log("DEBUG: extension =", extension);
+    
+    const result = {
+      hasAnimation: false,
+      files: {},
+      types: {}
+    };
+    
+    const fileTypes = [
+      { key: "entry", num: "1" },
+      { key: "idle", num: "2" },
+      { key: "special", num: "3" }
+    ];
+    
+    const formats = [
+      { suffix: ".mp4", type: "video" },
+      { suffix: ".gif", type: "gif" }
+    ];
+    
+    for (const ft of fileTypes) {
+      for (const fmt of formats) {
+        const resPath = searchPkgResourceWithExtension(
+          extension, 
+          "/image/generals/", 
+          name + ft.num, 
+          fmt.suffix
+        );
+        
+        if (resPath) {
+          result.files[ft.key] = resPath;
+          result.types[ft.key] = fmt.type;
+          result.hasAnimation = true;
+          console.log("DEBUG: Found", ft.key, "at", resPath);
+          break; // 找到一种格式就停止查找该类型
+        }
+      }
+    }
+    
+    console.log("DEBUG: final result =", JSON.stringify(result));
+    return result;
+    
+  } catch (e) {
+    console.error("ERROR in getGeneralAnimationFiles:", e);
+    return defaultResult; // 出错时返回安全默认值，避免 QML 崩溃
+  }
+}
 }
